@@ -1,0 +1,6 @@
+source, model             , length_controlled_winrate
+en    , Llama-3-8B-SFT-DPO,                     23.80
+es    , Llama-3-8B-SFT-DPO,                     15.33
+ru    , Llama-3-8B-SFT-DPO,                     14.77
+de    , Llama-3-8B-SFT-DPO,                     12.86
+fr    , Llama-3-8B-SFT-DPO,                     16.39

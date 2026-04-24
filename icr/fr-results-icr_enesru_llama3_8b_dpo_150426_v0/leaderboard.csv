@@ -1,0 +1,2 @@
+                               , length_controlled_winrate, win_rate, standard_error, mode     , avg_length, n_wins, n_wins_base, n_draws, n_total, discrete_win_rate, lc_standard_error
+icr_enesru_llama3_8b_dpo_150426,                     20.80,    22.86,           1.48, community,       1720,    183,         620,       2,     805,             22.86,              0.34
