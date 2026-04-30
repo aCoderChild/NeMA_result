@@ -1,0 +1,6 @@
+folder,lang_prefix,model_type,version,total_samples,mislang_count,mislang_pct,avg_length,top1_lang,top1_count,top1_pct,top2_lang,top2_count,top2_pct,top3_lang,top3_count,top3_pct,others_count,others_pct
+de.json.prediction.with_Llama-3-Base-8B-SFT-DPO.to_de.jsonl,de,Llama-3-Base-8B-SFT-DPO,baseline,805,222,27.58,1710.02,en,217,97.75,fr,2,0.90,zh,2,0.90,1,0.45
+en.json.prediction.with_Llama-3-Base-8B-SFT-DPO.to_en.jsonl,en,Llama-3-Base-8B-SFT-DPO,baseline,805,5,0.62,1760.10,de,1,20.00,is,1,20.00,he,1,20.00,2,40.00
+es.json.prediction.with_Llama-3-Base-8B-SFT-DPO.to_es.jsonl,es,Llama-3-Base-8B-SFT-DPO,baseline,805,208,25.84,1672.90,en,202,97.12,fr,3,1.44,de,1,0.48,2,0.96
+fr.json.prediction.with_Llama-3-Base-8B-SFT-DPO.to_fr.jsonl,fr,Llama-3-Base-8B-SFT-DPO,baseline,805,142,17.64,1713.53,en,139,97.89,es,2,1.41,de,1,0.70,0,0.00
+ru.json.prediction.with_Llama-3-Base-8B-SFT-DPO.to_ru.jsonl,ru,Llama-3-Base-8B-SFT-DPO,baseline,805,230,28.57,1636.20,en,223,96.96,fr,4,1.74,es,1,0.43,2,0.87

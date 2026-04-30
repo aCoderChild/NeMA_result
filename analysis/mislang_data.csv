@@ -1,0 +1,4 @@
+filename,total_samples,mismatch_count,mislang_pct,avg_response_length,top1_lang,top1_count,top1_pct,top2_lang,top2_count,top2_pct,top3_lang,top3_count,top3_pct
+train_icr.jsonl,10000,4801,48.01,1872.79,en,4180,87.07,pt,41,0.85,fa,37,0.77
+train_mapo.jsonl,9188,1762,19.18,3290.79,en,1027,58.29,fr,185,10.50,es,83,4.71
+train_lacomsa.jsonl,9991,4322,43.26,3628.46,en,3326,76.96,es,333,7.70,fr,59,1.37
