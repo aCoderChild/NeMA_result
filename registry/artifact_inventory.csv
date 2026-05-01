@@ -1,0 +1,15 @@
+artifact_path,type,producer_script,status,description
+/home/gangstat/NeMA_result/analysis/mislang_data.csv,csv,/home/gangstat/NeMA_result/scripts/analysis/mislang.py,active,Dataset-level mislang summary
+/home/gangstat/NeMA_result/analysis/mislang_model_baseline.csv,csv,/home/gangstat/NeMA_result/scripts/analysis/mislang_base.py,active,Baseline model mislang summary
+/home/gangstat/NeMA_result/analysis/mislang_model_icr.csv,csv,/home/gangstat/NeMA_result/scripts/analysis/mislang_model.py,active,ICR model mislang summary
+/home/gangstat/NeMA_result/analysis/mislang_model_lacomsa.csv,csv,/home/gangstat/NeMA_result/scripts/analysis/mislang_model.py,active,LACOMSA model mislang summary
+/home/gangstat/NeMA_result/analysis/mislang_model_mapo.csv,csv,/home/gangstat/NeMA_result/scripts/analysis/mislang_model.py,active,MAPO model mislang summary
+/home/gangstat/NeMA_result/analysis/cm_icr.csv,csv,/home/gangstat/NeMA_result/scripts/analysis/export_confusion_matrix.py,active,Confusion matrix for ICR training data
+/home/gangstat/NeMA_result/analysis/cm_lacomsa.csv,csv,/home/gangstat/NeMA_result/scripts/analysis/export_confusion_matrix.py,active,Confusion matrix for LACOMSA training data
+/home/gangstat/NeMA_result/analysis/cm_mapo.csv,csv,/home/gangstat/NeMA_result/scripts/analysis/export_confusion_matrix.py,active,Confusion matrix for MAPO training data
+/home/gangstat/NeMA_result/analysis/figures/overview_icr.png,png,/home/gangstat/NeMA_result/scripts/visualization/plot_confusion_with_summary.py,active,ICR overview panel
+/home/gangstat/NeMA_result/analysis/figures/overview_lacomsa.png,png,/home/gangstat/NeMA_result/scripts/visualization/plot_confusion_with_summary.py,active,LACOMSA overview panel
+/home/gangstat/NeMA_result/analysis/figures/overview_mapo.png,png,/home/gangstat/NeMA_result/scripts/visualization/plot_confusion_with_summary.py,active,MAPO overview panel
+/home/gangstat/NeMA_result/analysis/figures/overview_stacked_vertical.png,png,/home/gangstat/NeMA_result/scripts/visualization/stack_overview_images.py,active,Stacked overview image for quick review
+/home/gangstat/NeMA_result/analysis/figures/winrate_icr_lacomsa_mapo_best_filtered.png,png,/home/gangstat/NeMA_result/scripts/visualization/plot_length_controlled_winrate.py,active,Best-filtered LC winrate figure
+/home/gangstat/NeMA_result/analysis/figures/lc_winrate_npo_checkpoints.png,png,/home/gangstat/NeMA_result/scripts/visualization/plot_lc_winrate_npo.py,active,NPO checkpoints plus NPO general

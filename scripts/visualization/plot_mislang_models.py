@@ -26,8 +26,11 @@ def load_data(csv_path):
 
 
 def aggregate_by_model_and_lang(df):
+    lang_order = df["lang_prefix"].drop_duplicates().tolist()
+    model_order = df["model_type"].drop_duplicates().tolist()
+
     grouped = (
-        df.groupby(["lang_prefix", "model_type"], as_index=False)
+        df.groupby(["lang_prefix", "model_type"], as_index=False, sort=False)
         .agg(
             mislang_pct=("mislang_pct", "mean"),
             avg_length=("avg_length", "mean"),
@@ -36,9 +39,15 @@ def aggregate_by_model_and_lang(df):
             top3_pct=("top3_pct", "mean"),
             others_pct=("others_pct", "mean"),
         )
-        .sort_values(["lang_prefix", "model_type"])
     )
-    return grouped
+    grouped["lang_prefix"] = pd.Categorical(
+        grouped["lang_prefix"], categories=lang_order, ordered=True
+    )
+    grouped["model_type"] = pd.Categorical(
+        grouped["model_type"], categories=model_order, ordered=True
+    )
+    grouped = grouped.sort_values(["lang_prefix", "model_type"], kind="stable")
+    return grouped, lang_order, model_order
 
 
 def plot_heatmap(ax, matrix, title, cmap):
@@ -57,14 +66,13 @@ def plot_heatmap(ax, matrix, title, cmap):
 
 def plot_stacked_mix(ax, grouped):
     by_model = (
-        grouped.groupby("model_type", as_index=False)
+        grouped.groupby("model_type", as_index=False, sort=False)
         .agg(
             top1_pct=("top1_pct", "mean"),
             top2_pct=("top2_pct", "mean"),
             top3_pct=("top3_pct", "mean"),
             others_pct=("others_pct", "mean"),
         )
-        .sort_values("model_type")
     )
 
     x = range(len(by_model))
@@ -104,14 +112,14 @@ def main():
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
 
     df = load_data(args.input)
-    grouped = aggregate_by_model_and_lang(df)
+    grouped, lang_order, model_order = aggregate_by_model_and_lang(df)
 
     mislang_matrix = grouped.pivot(
         index="lang_prefix", columns="model_type", values="mislang_pct"
-    ).fillna(0.0)
+    ).fillna(0.0).reindex(index=lang_order, columns=model_order)
     length_matrix = grouped.pivot(
         index="lang_prefix", columns="model_type", values="avg_length"
-    ).fillna(0.0)
+    ).fillna(0.0).reindex(index=lang_order, columns=model_order)
 
     if args.skip_composition:
         fig = plt.figure(figsize=(24, 7))

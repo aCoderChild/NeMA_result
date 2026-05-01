@@ -11,8 +11,8 @@ import numpy as np
 
 MODEL_FILE = "lid.176.ftz"
 MODEL_URL = "https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.ftz"
-RESPONSES_ROOT = "/home/gangstat/NeMA_result/responses/mapo"
-OUTPUT_CSV = "/home/gangstat/NeMA_result/analysis/mislang_model_mapo.csv"
+RESPONSES_ROOT = "/home/gangstat/NeMA_result/responses/lacomsa"
+OUTPUT_CSV = "/home/gangstat/NeMA_result/analysis/mislang_model_lacomsa.csv"
 
 FOLDER_PATTERN = re.compile(
     r"^(?P<lang_prefix>[a-z]+)-results-.*?_8b_(?P<model_type>.+?)_(?P<version>v\d+)$"
@@ -43,6 +43,13 @@ def parse_folder_metadata(folder_name):
     if not match:
         return None
     return match.groupdict()
+
+
+def should_keep_model(model_type):
+    normalized = model_type.strip().lower()
+    if normalized.startswith("dpo") and normalized != "dpo_250426":
+        return False
+    return True
 
 
 def detect_lang(ft_model, text):
@@ -148,6 +155,8 @@ def main():
 
         meta = parse_folder_metadata(entry.name)
         if not meta:
+            continue
+        if not should_keep_model(meta["model_type"]):
             continue
 
         model_outputs_path = os.path.join(entry.path, "model_outputs.json")

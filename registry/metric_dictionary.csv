@@ -1,0 +1,11 @@
+metric_name,definition,unit,source_columns,used_by
+mislang_pct,Percent of samples where detected language differs from expected language,percent,"mismatch_count,total_samples","mislang.py, mislang_base.py, mislang_model.py, plot_mislang_models.py, plot_confusion_with_summary.py"
+avg_response_length,Average character length of analyzed model outputs,characters,"total_output_characters,total_samples","mislang.py, plot_confusion_with_summary.py"
+avg_length,Average character length of analyzed model outputs (model-level CSV variant),characters,"output_total_length,total_samples","mislang_base.py, mislang_model.py, plot_mislang_models.py"
+length_controlled_winrate,Win rate after length normalization/control,percent,"length_controlled_winrate","plot_length_controlled_winrate.py, plot_lc_winrate_npo.py"
+win_rate,Raw win rate without length control,percent,"win_rate","fallback in plot_length_controlled_winrate.py and plot_lc_winrate_npo.py"
+confusion_pct,Percentage of detected language within an expected-language row in confusion matrix,percent,"cm_<dataset>.csv cell values","plot_confusion_heatmaps.py, plot_confusion_with_summary.py"
+top1_pct,Share of most frequent detected wrong language among mismatches,percent,"top1_count,mislang_count","mislang.py, mislang_base.py, mislang_model.py, plot_mislang_models.py"
+top2_pct,Share of second most frequent detected wrong language among mismatches,percent,"top2_count,mislang_count","mislang.py, mislang_base.py, mislang_model.py, plot_mislang_models.py"
+top3_pct,Share of third most frequent detected wrong language among mismatches,percent,"top3_count,mislang_count","mislang.py, mislang_base.py, mislang_model.py, plot_mislang_models.py"
+others_pct,Share of all remaining detected wrong languages outside top3,percent,"others_count,mislang_count","mislang_base.py, mislang_model.py, plot_mislang_models.py"
