@@ -1,152 +1,120 @@
 import argparse
 import os
+import re
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
 
 
-DEFAULT_INPUT = "/home/gangstat/NeMA_result/analysis/mislang_model_lacomsa.csv"
-DEFAULT_OUTPUT = "/home/gangstat/NeMA_result/analysis/figures/mislang_models_overview.png"
-DEFAULT_NAME = "LaCoMSA"
+DEFAULT_INPUT = "analysis/lang_correct_incorrect_distribution_model_lacomsa.csv"
+DEFAULT_OUTPUT_DIR = "analysis/figures/mislang_models_lacomsa"
+LANG_ORDER = ["de", "en", "es", "fr", "ru"]
 
-def load_data(csv_path):
-    df = pd.read_csv(csv_path)
-    numeric_cols = [
-        "mislang_pct",
-        "avg_length",
-        "top1_pct",
-        "top2_pct",
-        "top3_pct",
-        "others_pct",
-    ]
-    for col in numeric_cols:
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0.0)
+
+def model_sort_key(model_type: str) -> tuple:
+    normalized = model_type.strip().lower()
+    if normalized == "dpo_250426":
+        return (0, 0)
+    if normalized == "npo":
+        return (1, 0)
+    if normalized.startswith("npo_checkpoint-"):
+        try:
+            checkpoint = int(re.search(r"npo_checkpoint-(\d+)", normalized).group(1))
+        except (IndexError, ValueError):
+            checkpoint = 999
+        return (2, checkpoint)
+    if normalized == "ppo":
+        return (3, 0)
+    if normalized == "sft":
+        return (4, 0)
+    if normalized == "w-reinforce":
+        return (5, 0)
+    return (99, normalized)
+
+
+def load_data(csv_path: str) -> pd.DataFrame:
+    df = pd.read_csv(csv_path, skipinitialspace=True)
+    df.columns = [column.strip() for column in df.columns]
+
+    for column in ["model_type", "lang"]:
+        if column in df.columns:
+            df[column] = df[column].astype(str).str.strip()
+
+    for column in ["total_samples", "correct_count", "incorrect_count", "no_responses"]:
+        if column in df.columns:
+            df[column] = pd.to_numeric(df[column], errors="coerce").fillna(0)
+
+    required_columns = {"model_type", "lang", "total_samples", "correct_count", "incorrect_count", "no_responses"}
+    missing = required_columns - set(df.columns)
+    if missing:
+        raise ValueError(f"Missing required columns in CSV: {sorted(missing)}")
+
     return df
 
 
-def aggregate_by_model_and_lang(df):
-    lang_order = df["lang_prefix"].drop_duplicates().tolist()
-    model_order = df["model_type"].drop_duplicates().tolist()
+def plot_language_breakdown(df: pd.DataFrame, lang: str, output_path: Path) -> None:
+    lang_df = df[df["lang"] == lang].copy()
+    if lang_df.empty:
+        print(f"Skipping {lang}: no rows found.")
+        return
 
-    grouped = (
-        df.groupby(["lang_prefix", "model_type"], as_index=False, sort=False)
-        .agg(
-            mislang_pct=("mislang_pct", "mean"),
-            avg_length=("avg_length", "mean"),
-            top1_pct=("top1_pct", "mean"),
-            top2_pct=("top2_pct", "mean"),
-            top3_pct=("top3_pct", "mean"),
-            others_pct=("others_pct", "mean"),
-        )
-    )
-    grouped["lang_prefix"] = pd.Categorical(
-        grouped["lang_prefix"], categories=lang_order, ordered=True
-    )
-    grouped["model_type"] = pd.Categorical(
-        grouped["model_type"], categories=model_order, ordered=True
-    )
-    grouped = grouped.sort_values(["lang_prefix", "model_type"], kind="stable")
-    return grouped, lang_order, model_order
+    lang_df["model_sort"] = lang_df["model_type"].map(model_sort_key)
+    lang_df = lang_df.sort_values("model_sort", kind="stable")
 
+    x = range(len(lang_df))
+    correct = lang_df["correct_count"].to_numpy()
+    incorrect = lang_df["incorrect_count"].to_numpy()
+    no_responses = lang_df["no_responses"].to_numpy()
 
-def plot_heatmap(ax, matrix, title, cmap):
-    im = ax.imshow(matrix.values, aspect="auto", cmap=cmap)
-    ax.set_title(title, pad=14)
-    ax.set_xticks(range(len(matrix.columns)))
-    ax.set_xticklabels(matrix.columns, rotation=35, ha="right")
-    ax.set_yticks(range(len(matrix.index)))
-    ax.set_yticklabels(matrix.index)
-    for y in range(matrix.shape[0]):
-        for x in range(matrix.shape[1]):
-            val = matrix.iat[y, x]
-            ax.text(x, y, f"{val:.2f}", ha="center", va="center", fontsize=7)
-    return im
+    fig, ax = plt.subplots(figsize=(16, 7))
+    ax.bar(x, correct, label="Correct", color="#2b8cbe")
+    ax.bar(x, incorrect, bottom=correct, label="Incorrect", color="#fdae61")
+    ax.bar(x, no_responses, bottom=correct + incorrect, label="No responses", color="#d73027")
 
-
-def plot_stacked_mix(ax, grouped):
-    by_model = (
-        grouped.groupby("model_type", as_index=False, sort=False)
-        .agg(
-            top1_pct=("top1_pct", "mean"),
-            top2_pct=("top2_pct", "mean"),
-            top3_pct=("top3_pct", "mean"),
-            others_pct=("others_pct", "mean"),
-        )
-    )
-
-    x = range(len(by_model))
-    b1 = by_model["top1_pct"].values
-    b2 = by_model["top2_pct"].values
-    b3 = by_model["top3_pct"].values
-    b4 = by_model["others_pct"].values
-
-    ax.bar(x, b1, label="Top1 %")
-    ax.bar(x, b2, bottom=b1, label="Top2 %")
-    ax.bar(x, b3, bottom=b1 + b2, label="Top3 %")
-    ax.bar(x, b4, bottom=b1 + b2 + b3, label="Others %")
     ax.set_xticks(list(x))
-    ax.set_xticklabels(by_model["model_type"].tolist(), rotation=45, ha="right")
-    ax.set_ylabel("Share within mislang (%)")
-    ax.set_title("Mis-used Language Composition by Model Type", pad=10)
-    ax.legend(loc="upper right", fontsize=8)
+    ax.set_xticklabels(lang_df["model_type"].tolist(), rotation=35, ha="right")
+    ax.set_ylabel("Count")
+    ax.set_title(f"Mislang breakdown for {lang.upper()}")
+    ax.set_ylim(0, max(lang_df["total_samples"].max(), (correct + incorrect + no_responses).max()) * 1.08)
+    ax.legend(loc="upper right")
+    ax.grid(axis="y", alpha=0.25)
+
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=220)
+    plt.close(fig)
+    print(f"Saved visualization: {output_path}")
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Visualize mislang model analysis CSV efficiently."
+        description="Create one mislang visualization PNG per language."
     )
-    parser.add_argument("--name", default=DEFAULT_NAME)
     parser.add_argument("--input", default=DEFAULT_INPUT, help="Input CSV path.")
-    parser.add_argument("--output", default=DEFAULT_OUTPUT, help="Output image path.")
     parser.add_argument(
-        "--skip-composition",
-        action="store_true",
-        help="Skip the mis-used language composition subplot.",
+        "--output-dir",
+        default=DEFAULT_OUTPUT_DIR,
+        help="Directory where the five PNG files will be written.",
+    )
+    parser.add_argument(
+        "--langs",
+        nargs="*",
+        default=LANG_ORDER,
+        help="Languages to plot, in order.",
     )
     args = parser.parse_args()
 
     if not os.path.exists(args.input):
         raise FileNotFoundError(f"Input CSV not found: {args.input}")
 
-    os.makedirs(os.path.dirname(args.output), exist_ok=True)
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     df = load_data(args.input)
-    grouped, lang_order, model_order = aggregate_by_model_and_lang(df)
 
-    mislang_matrix = grouped.pivot(
-        index="lang_prefix", columns="model_type", values="mislang_pct"
-    ).fillna(0.0).reindex(index=lang_order, columns=model_order)
-    length_matrix = grouped.pivot(
-        index="lang_prefix", columns="model_type", values="avg_length"
-    ).fillna(0.0).reindex(index=lang_order, columns=model_order)
-
-    if args.skip_composition:
-        fig = plt.figure(figsize=(24, 7))
-        grid = fig.add_gridspec(1, 2, hspace=0.3, wspace=0.35)
-        ax1 = fig.add_subplot(grid[0, 0])
-        ax2 = fig.add_subplot(grid[0, 1])
-        ax3 = None
-    else:
-        fig = plt.figure(figsize=(21, 12))
-        grid = fig.add_gridspec(2, 2, height_ratios=[1, 1], hspace=0.42, wspace=0.35)
-        ax1 = fig.add_subplot(grid[0, 0])
-        ax2 = fig.add_subplot(grid[0, 1])
-        ax3 = fig.add_subplot(grid[1, :])
-
-    im1 = plot_heatmap(ax1, mislang_matrix, "Mislang % (Lang x Model Type)", "YlOrRd")
-    im2 = plot_heatmap(ax2, length_matrix, "Avg Length (Lang x Model Type)", "YlGnBu")
-    if ax3 is not None:
-        plot_stacked_mix(ax3, grouped)
-
-    fig.colorbar(im1, ax=ax1, fraction=0.046, pad=0.04)
-    fig.colorbar(im2, ax=ax2, fraction=0.046, pad=0.04)
-    fig.suptitle(args.name, fontsize=16, y=0.985)
-    fig.subplots_adjust(left=0.07, right=0.985, top=0.90, bottom=0.16)
-
-    plt.savefig(args.output, dpi=220)
-    plt.close(fig)
-    print(f"Saved visualization: {args.output}")
+    for lang in args.langs:
+        output_path = output_dir / f"mislang_models_{lang}.png"
+        plot_language_breakdown(df, lang, output_path)
 
 
 if __name__ == "__main__":

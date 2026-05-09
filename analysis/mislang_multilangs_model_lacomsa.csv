@@ -1,0 +1,66 @@
+method , model_type       , expected_lang, de , fr , en , es , ru , others
+lacomsa, dpo              , de           , 613,   2, 186,   0,   0,      4
+lacomsa, npo_checkpoint-10, de           , 598,   2, 201,   0,   0,      4
+lacomsa, npo_checkpoint-1 , de           , 588,   2, 209,   1,   0,      5
+lacomsa, npo_checkpoint-20, de           , 736,   1,  62,   2,   0,      4
+lacomsa, npo_checkpoint-2 , de           , 584,   2, 213,   1,   0,      5
+lacomsa, npo_checkpoint-30, de           , 786,   2,   9,   0,   3,      2
+lacomsa, npo_checkpoint-3 , de           , 585,   3, 210,   1,   0,      6
+lacomsa, npo_checkpoint-4 , de           , 581,   2, 219,   0,   0,      3
+lacomsa, npo_checkpoint-5 , de           , 586,   3, 214,   1,   0,      1
+lacomsa, npo              , de           , 789,   1,   2,   1,   4,      6
+lacomsa, ppo              , de           , 595,   2, 205,   1,   0,      2
+lacomsa, sft              , de           , 608,   2, 192,   0,   0,      3
+lacomsa, w-reinforce      , de           , 600,   2, 199,   1,   0,      3
+lacomsa, dpo              , en           ,   1,   1, 801,   1,   0,      1
+lacomsa, npo_checkpoint-10, en           ,   0,   1, 804,   0,   0,      0
+lacomsa, npo_checkpoint-1 , en           ,   0,   1, 804,   0,   0,      0
+lacomsa, npo_checkpoint-20, en           ,   0,   3, 798,   1,   0,      3
+lacomsa, npo_checkpoint-2 , en           ,   2,   1, 799,   1,   0,      2
+lacomsa, npo_checkpoint-30, en           ,  21,  40, 658,  13,  29,     43
+lacomsa, npo_checkpoint-3 , en           ,   2,   1, 800,   1,   0,      1
+lacomsa, npo_checkpoint-4 , en           ,   0,   1, 804,   0,   0,      0
+lacomsa, npo_checkpoint-5 , en           ,   1,   1, 802,   0,   0,      1
+lacomsa, npo              , en           ,  28,  48, 577,  18,  47,     85
+lacomsa, ppo              , en           ,   1,   2, 801,   0,   0,      1
+lacomsa, sft              , en           ,   0,   1, 802,   0,   0,      2
+lacomsa, w-reinforce      , en           ,   3,   1, 800,   1,   0,      0
+lacomsa, dpo              , es           ,   1,   2, 167, 632,   0,      3
+lacomsa, npo_checkpoint-10, es           ,   2,   2, 189, 609,   0,      3
+lacomsa, npo_checkpoint-1 , es           ,   0,   2, 211, 591,   0,      1
+lacomsa, npo_checkpoint-20, es           ,   0,   3,  38, 764,   0,      0
+lacomsa, npo_checkpoint-2 , es           ,   0,   2, 210, 591,   0,      2
+lacomsa, npo_checkpoint-30, es           ,   0,   1,   7, 791,   3,      2
+lacomsa, npo_checkpoint-3 , es           ,   1,   1, 202, 601,   0,      0
+lacomsa, npo_checkpoint-4 , es           ,   0,   1, 204, 600,   0,      0
+lacomsa, npo_checkpoint-5 , es           ,   0,   3, 202, 599,   0,      1
+lacomsa, npo              , es           ,   0,   4,   6, 781,   6,      6
+lacomsa, ppo              , es           ,   3,   0, 194, 606,   0,      2
+lacomsa, sft              , es           ,   1,   1, 159, 642,   0,      2
+lacomsa, w-reinforce      , es           ,   0,   1, 190, 613,   0,      1
+lacomsa, dpo              , fr           ,   1, 683, 118,   1,   0,      2
+lacomsa, npo_checkpoint-10, fr           ,   1, 678, 125,   0,   0,      1
+lacomsa, npo_checkpoint-1 , fr           ,   1, 667, 136,   0,   0,      1
+lacomsa, npo_checkpoint-20, fr           ,   1, 769,  31,   0,   0,      4
+lacomsa, npo_checkpoint-2 , fr           ,   0, 670, 134,   0,   0,      1
+lacomsa, npo_checkpoint-30, fr           ,   0, 797,   5,   0,   0,      1
+lacomsa, npo_checkpoint-3 , fr           ,   0, 663, 139,   0,   0,      3
+lacomsa, npo_checkpoint-4 , fr           ,   1, 668, 135,   0,   0,      1
+lacomsa, npo_checkpoint-5 , fr           ,   1, 664, 138,   0,   0,      2
+lacomsa, npo              , fr           ,   2, 785,   5,   1,   2,      4
+lacomsa, ppo              , fr           ,   0, 677, 124,   0,   0,      4
+lacomsa, sft              , fr           ,   1, 675, 126,   0,   0,      3
+lacomsa, w-reinforce      , fr           ,   0, 675, 125,   1,   0,      4
+lacomsa, dpo              , ru           ,   0,   3, 202,   1, 597,      2
+lacomsa, npo_checkpoint-10, ru           ,   0,   3, 215,   1, 583,      3
+lacomsa, npo_checkpoint-1 , ru           ,   0,   3, 217,   1, 581,      3
+lacomsa, npo_checkpoint-20, ru           ,   0,   1,  39,   0, 763,      2
+lacomsa, npo_checkpoint-2 , ru           ,   0,   1, 226,   1, 575,      2
+lacomsa, npo_checkpoint-30, ru           ,   0,   0,   4,   0, 767,      5
+lacomsa, npo_checkpoint-3 , ru           ,   0,   1, 225,   1, 575,      3
+lacomsa, npo_checkpoint-4 , ru           ,   1,   2, 219,   1, 578,      4
+lacomsa, npo_checkpoint-5 , ru           ,   0,   3, 231,   1, 568,      2
+lacomsa, npo              , ru           ,   0,   0,   6,   0, 730,      7
+lacomsa, ppo              , ru           ,   0,   2, 249,   1, 551,      2
+lacomsa, sft              , ru           ,   0,   1, 178,   0, 623,      3
+lacomsa, w-reinforce      , ru           ,   1,   2, 215,   1, 583,      3

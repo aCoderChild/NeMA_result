@@ -8,19 +8,28 @@ import re
 import matplotlib.pyplot as plt
 
 
-LANGUAGES = ["de", "en", "es", "fr", "ru"]
+LANGUAGES = ["es", "ru", "en", "fr", "de"]
 METHOD_ORDER = ["icr", "lacomsa", "mapo"]
 METHOD_LABELS = {
     "icr": "ICR",
     "lacomsa": "LACOMSA",
     "mapo": "MAPO",
 }
+
 BASELINE_LC = {
     "en": 23.80,
     "es": 15.33,
     "ru": 14.77,
     "de": 12.86,
     "fr": 16.39,
+}
+
+BASELINE = {
+    "en": 22.61,
+    "es": 16.21,
+    "ru": 19.32,
+    "de": 15.28,
+    "fr": 18.88,
 }
 
 
@@ -56,7 +65,11 @@ def load_length_controlled_winrate(
         # utf-8-sig helps when CSV header starts with BOM (e.g. "\ufeffsource").
         with csv_path.open("r", encoding="utf-8-sig", newline="") as f:
             reader = csv.DictReader(f)
+            # Normalize field names to strip leading/trailing whitespace
+            reader.fieldnames = [name.strip() for name in reader.fieldnames]
             for row in reader:
+                # Normalize row keys to match stripped fieldnames
+                row = {k.strip(): v for k, v in row.items()}
                 source = (row.get("source", "") or "").strip().lower()
                 model_name = (row.get("model", "") or "").strip()
 
@@ -68,9 +81,7 @@ def load_length_controlled_winrate(
                     continue
 
                 # Primary metric for this figure is length-controlled win rate.
-                raw_value = row.get("length_controlled_winrate", "") or row.get(
-                    "win_rate", ""
-                )
+                raw_value = row.get("win_rate", "")
                 if raw_value in ("", None):
                     continue
                 try:
@@ -116,7 +127,7 @@ def plot_grouped_barchart(
         for model in model_order
         for lang in LANGUAGES
     )
-    y_max = max(max_bar, max(BASELINE_LC.values())) * 1.12
+    y_max = max(max_bar, max(BASELINE.values())) * 1.12
 
     for idx, method in enumerate(METHOD_ORDER):
         ax = axes[idx]
@@ -132,7 +143,7 @@ def plot_grouped_barchart(
             bar_colors[lang] = bars[0].get_facecolor()
 
         for lang in LANGUAGES:
-            baseline = BASELINE_LC.get(lang)
+            baseline = BASELINE.get(lang)
             if baseline is None:
                 continue
             ax.axhline(
@@ -151,7 +162,7 @@ def plot_grouped_barchart(
         ax.grid(axis="y", linestyle="--", alpha=0.35)
         ax.set_ylim(0, y_max)
         if idx == 0:
-            ax.set_ylabel("length_controlled_winrate")
+            ax.set_ylabel("winrate")
 
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(
@@ -162,7 +173,7 @@ def plot_grouped_barchart(
         ncol=5,
         bbox_to_anchor=(0.5, 0.01),
     )
-    fig.suptitle("NPO Length-Controlled Winrate by Method, Checkpoint, and Language")
+    fig.suptitle("NPO Winrate by Method, Checkpoint, and Language")
 
     fig.tight_layout(rect=[0, 0.08, 1, 0.90])
     fig.subplots_adjust(bottom=0.18)
@@ -174,7 +185,7 @@ def plot_grouped_barchart(
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Plot NPO-only grouped barcharts of length_controlled_winrate for "
+            "Plot NPO-only grouped barcharts of winrate for "
             "ICR/LACOMSA/MAPO with all NPO checkpoints plus NPO general."
         )
     )
@@ -184,16 +195,13 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=[
             Path(
-                "/mnt/d/rail-cross-lingual-transfer/_test_local/data/"
-                "RAIL CrossLingual Transfer - ICR_150426_Run_Only.csv"
+                "results/full_npo/RAIL CrossLingual Transfer - ICR_Results_Run_01.csv"
             ),
             Path(
-                "/mnt/d/rail-cross-lingual-transfer/_test_local/data/"
-                "RAIL CrossLingual Transfer - LACOMSA_Results_Run_01.csv"
+                "results/full_npo/RAIL CrossLingual Transfer - LACOMSA_Results_Run_01.csv"
             ),
             Path(
-                "/mnt/d/rail-cross-lingual-transfer/_test_local/data/"
-                "RAIL CrossLingual Transfer - MAPO_Results_Run_01.csv"
+                "results/full_npo/RAIL CrossLingual Transfer - MAPO_Results_Run_01.csv"
             ),
         ],
         help="One or more input CSV paths.",
@@ -202,8 +210,7 @@ def parse_args() -> argparse.Namespace:
         "--output",
         type=Path,
         default=Path(
-            "/mnt/d/rail-cross-lingual-transfer/_test_local/visualization/"
-            "lc_winrate_npo_checkpoints.png"
+            "visualisation/winrate_npo_checkpoints.png"
         ),
         help="Path to output image (PNG).",
     )

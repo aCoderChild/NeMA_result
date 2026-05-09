@@ -11,9 +11,9 @@ import numpy as np
 
 MODEL_FILE = "lid.176.ftz"
 MODEL_URL = "https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.ftz"
-NAME = "icr"
-RESPONSES_ROOT = f"/home/gangstat/NeMA_result/responses/{NAME}"
-OUTPUT_CSV = f"/home/gangstat/NeMA_result/analysis/mislang_model_{NAME}_only_npo.csv"
+NAME = "lacomsa"
+RESPONSES_ROOT = f"responses/{NAME}"
+OUTPUT_CSV = f"analysis/mislang_model_{NAME}_only_npo.csv"
 
 FOLDER_PATTERN = re.compile(
     r"^(?P<lang_prefix>[a-z]+)-results-.*?_8b_(?P<model_type>.+?)_(?P<version>v\d+)$"

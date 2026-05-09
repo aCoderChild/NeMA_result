@@ -11,12 +11,12 @@ except ImportError:
 
 
 DEFAULT_CM_INPUTS = [
-    "/home/gangstat/NeMA_result/analysis/cm_icr.csv",
-    "/home/gangstat/NeMA_result/analysis/cm_lacomsa.csv",
-    "/home/gangstat/NeMA_result/analysis/cm_mapo.csv",
+    "analysis/cm_icr.csv",
+    "analysis/cm_lacomsa.csv",
+    "analysis/cm_mapo.csv",
 ]
-DEFAULT_MISLANG_CSV = "/home/gangstat/NeMA_result/analysis/mislang_data.csv"
-DEFAULT_OUTPUT = "/home/gangstat/NeMA_result/analysis/figures/confusion_with_summary.png"
+DEFAULT_MISLANG_CSV = "analysis/mislang_data.csv"
+DEFAULT_OUTPUT = "analysis/figures/confusion_with_summary.png"
 
 
 def load_confusion_csv(csv_path):

@@ -1,0 +1,66 @@
+model_type       , lang, total_samples, correct_count, incorrect_count, no_responses
+dpo              , de  ,           805,           661,             144,            0
+dpo              , en  ,           805,           802,               3,            0
+dpo              , es  ,           805,           683,             122,            0
+dpo              , fr  ,           805,           713,              92,            0
+dpo              , ru  ,           805,           647,             158,            0
+npo              , de  ,           805,             0,             805,            0
+npo              , en  ,           805,           802,               3,            0
+npo              , es  ,           805,             0,             805,            0
+npo              , fr  ,           805,             1,             804,            0
+npo              , ru  ,           805,             0,             796,            9
+npo_checkpoint-1 , de  ,           805,           588,             217,            0
+npo_checkpoint-1 , en  ,           805,           804,               1,            0
+npo_checkpoint-1 , es  ,           805,           591,             214,            0
+npo_checkpoint-1 , fr  ,           805,           667,             138,            0
+npo_checkpoint-1 , ru  ,           805,           581,             224,            0
+npo_checkpoint-10, de  ,           805,           536,             269,            0
+npo_checkpoint-10, en  ,           805,           802,               3,            0
+npo_checkpoint-10, es  ,           805,           543,             262,            0
+npo_checkpoint-10, fr  ,           805,           620,             185,            0
+npo_checkpoint-10, ru  ,           805,           527,             278,            0
+npo_checkpoint-2 , de  ,           805,           585,             220,            0
+npo_checkpoint-2 , en  ,           805,           801,               4,            0
+npo_checkpoint-2 , es  ,           805,           593,             212,            0
+npo_checkpoint-2 , fr  ,           805,           669,             136,            0
+npo_checkpoint-2 , ru  ,           805,           579,             226,            0
+npo_checkpoint-20, de  ,           805,             1,             804,            0
+npo_checkpoint-20, en  ,           805,           803,               2,            0
+npo_checkpoint-20, es  ,           805,             0,             805,            0
+npo_checkpoint-20, fr  ,           805,             1,             804,            0
+npo_checkpoint-20, ru  ,           805,             0,             805,            0
+npo_checkpoint-3 , de  ,           805,           596,             209,            0
+npo_checkpoint-3 , en  ,           805,           803,               2,            0
+npo_checkpoint-3 , es  ,           805,           597,             208,            0
+npo_checkpoint-3 , fr  ,           805,           665,             140,            0
+npo_checkpoint-3 , ru  ,           805,           579,             226,            0
+npo_checkpoint-30, de  ,           805,             1,             804,            0
+npo_checkpoint-30, en  ,           805,           804,               1,            0
+npo_checkpoint-30, es  ,           805,             0,             805,            0
+npo_checkpoint-30, fr  ,           805,             1,             804,            0
+npo_checkpoint-30, ru  ,           805,             0,             804,            1
+npo_checkpoint-4 , de  ,           805,           578,             227,            0
+npo_checkpoint-4 , en  ,           805,           799,               6,            0
+npo_checkpoint-4 , es  ,           805,           592,             213,            0
+npo_checkpoint-4 , fr  ,           805,           667,             138,            0
+npo_checkpoint-4 , ru  ,           805,           572,             233,            0
+npo_checkpoint-5 , de  ,           805,           583,             222,            0
+npo_checkpoint-5 , en  ,           805,           801,               4,            0
+npo_checkpoint-5 , es  ,           805,           599,             206,            0
+npo_checkpoint-5 , fr  ,           805,           665,             140,            0
+npo_checkpoint-5 , ru  ,           805,           572,             233,            0
+ppo              , de  ,           805,           779,              26,            0
+ppo              , en  ,           805,           797,               8,            0
+ppo              , es  ,           805,           780,              25,            0
+ppo              , fr  ,           805,           783,              22,            0
+ppo              , ru  ,           805,           788,              17,            0
+sft              , de  ,           805,           785,              20,            0
+sft              , en  ,           805,           791,              14,            0
+sft              , es  ,           805,           780,              25,            0
+sft              , fr  ,           805,           793,              12,            0
+sft              , ru  ,           805,           785,              20,            0
+w-reinforce      , de  ,           805,           645,             160,            0
+w-reinforce      , en  ,           805,           803,               2,            0
+w-reinforce      , es  ,           805,           658,             147,            0
+w-reinforce      , fr  ,           805,           707,              98,            0
+w-reinforce      , ru  ,           805,           612,             193,            0

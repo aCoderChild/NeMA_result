@@ -11,8 +11,8 @@ import numpy as np
 
 MODEL_FILE = "lid.176.ftz"
 MODEL_URL = "https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.ftz"
-RESPONSES_ROOT = "/home/gangstat/NeMA_result/responses/lacomsa"
-OUTPUT_CSV = "/home/gangstat/NeMA_result/analysis/mislang_model_lacomsa.csv"
+RESPONSES_ROOT = "responses/icr"
+OUTPUT_CSV = "analysis/lang_correct_incorrect_distribution_model_icr.csv"
 
 FOLDER_PATTERN = re.compile(
     r"^(?P<lang_prefix>[a-z]+)-results-.*?_8b_(?P<model_type>.+?)_(?P<version>v\d+)$"
@@ -60,95 +60,111 @@ def detect_lang(ft_model, text):
 def analyze_model_outputs_file(ft_model, model_outputs_path, expected_lang):
     with open(model_outputs_path, "r", encoding="utf-8") as f:
         data = json.load(f)
-
-    stats = {"total": 0, "mismatch": 0}
+    # Use total = number of entries in the file so missing/failed detections are
+    # still counted and can be treated as incorrect.
+    stats = {"total": 0, "correct": 0, "incorrect": 0, "no_responses": 0}
     output_total_length = 0
     mismatch_detected_counter = Counter()
+    ground_truth_lang_counter = Counter()
+    seen_records = set()
 
-    for item in data:
+    for i, item in enumerate(data):
+        record_key = (
+            item.get("id"),
+            item.get("instruction"),
+            item.get("output"),
+        )
+        if record_key in seen_records:
+            print(
+                f"DEBUG: Duplicate record skipped at {model_outputs_path} index={i}, "
+                f"id={item.get('id')}, expected_lang={expected_lang}"
+            )
+            continue
+        seen_records.add(record_key)
+
+        stats["total"] += 1
         output_text = item.get("output")
+
         if not output_text:
+            # Missing output — count as no_response and log debug
+            stats["no_responses"] += 1
+            print(f"DEBUG: Missing output at {model_outputs_path} index={i}, expected_lang={expected_lang}")
             continue
 
         output_clean = str(output_text).replace("\n", " ")
 
         try:
             output_lang = detect_lang(ft_model, output_clean)
-        except Exception:
+        except Exception as e:
+            # Detection failed — count as no_response and log debug
+            stats["no_responses"] += 1
+            print(
+                f"DEBUG: Language detection failed at {model_outputs_path} index={i}, "
+                f"expected_lang={expected_lang}, error={e}"
+            )
             continue
 
-        stats["total"] += 1
         output_total_length += len(output_clean)
-        if output_lang != expected_lang:
-            stats["mismatch"] += 1
+
+        if output_lang == expected_lang:
+            stats["correct"] += 1
+        else:
+            stats["incorrect"] += 1
             mismatch_detected_counter[output_lang] += 1
+            ground_truth_lang_counter[expected_lang] += 1
 
-    return stats, output_total_length, mismatch_detected_counter
-
-
-def build_row(folder_name, meta, stats, output_total_length, mismatch_detected_counter):
-    total = stats["total"]
-    mismatch = stats["mismatch"]
-    mislang_pct = (mismatch / total * 100) if total else 0.0
-    avg_length = (output_total_length / total) if total else 0.0
-    top3 = mismatch_detected_counter.most_common(3)
-    top3_total = sum(count for _, count in top3)
-    others_count = max(0, mismatch - top3_total)
-    others_pct = (others_count / mismatch * 100) if mismatch else 0.0
-
-    row = {
-        "folder": folder_name,
-        "lang_prefix": meta["lang_prefix"],
-        "model_type": meta["model_type"],
-        "version": meta["version"],
-        "total_samples": total,
-        "mislang_count": mismatch,
-        "mislang_pct": f"{mislang_pct:.2f}",
-        "avg_length": f"{avg_length:.2f}",
-        "top1_lang": "",
-        "top1_count": "",
-        "top1_pct": "",
-        "top2_lang": "",
-        "top2_count": "",
-        "top2_pct": "",
-        "top3_lang": "",
-        "top3_count": "",
-        "top3_pct": "",
-        "others_count": others_count,
-        "others_pct": f"{others_pct:.2f}",
-    }
-
-    for i, (lang, count) in enumerate(top3, start=1):
-        pct = (count / mismatch * 100) if mismatch else 0.0
-        row[f"top{i}_lang"] = lang
-        row[f"top{i}_count"] = count
-        row[f"top{i}_pct"] = f"{pct:.2f}"
-
-    return row
+    return stats, output_total_length, mismatch_detected_counter, ground_truth_lang_counter
 
 
-def append_rows(rows):
+def build_aggregated_rows(model_type_data):
+    """Build rows aggregated by model_type and language with correct/incorrect counts."""
+    rows = []
+    
+    for model_type in sorted(model_type_data.keys()):
+        for lang in sorted(model_type_data[model_type].keys()):
+            data = model_type_data[model_type][lang]
+            total_incorrect = data["total_incorrect"]
+            total_correct = data["total_correct"]
+            total_no_responses = data.get("total_no_responses", 0)
+            total_samples = total_correct + total_incorrect + total_no_responses
+
+            row = {
+                "model_type": model_type,
+                "lang": lang,
+                "total_samples": total_samples,
+                "correct_count": total_correct,
+                "incorrect_count": total_incorrect,
+                "no_responses": total_no_responses,
+            }
+            
+            rows.append(row)
+    
+    return rows
+
+
+def write_aggregated_rows(rows, output_csv):
+    """Write aggregated rows to CSV, replacing existing file."""
     if not rows:
-        print("No rows to append.")
+        print("No rows to write.")
         return
 
-    fieldnames = list(rows[0].keys())
-    csv_exists = os.path.exists(OUTPUT_CSV) and os.path.getsize(OUTPUT_CSV) > 0
+    fieldnames = ["model_type", "lang", "total_samples", "correct_count", "incorrect_count", "no_responses"]
 
-    with open(OUTPUT_CSV, "a", encoding="utf-8", newline="") as f:
+    with open(output_csv, "w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
-        if not csv_exists:
-            writer.writeheader()
+        writer.writeheader()
         writer.writerows(rows)
 
-    print(f"Appended {len(rows)} row(s) to: {OUTPUT_CSV}")
+    print(f"Wrote {len(rows)} row(s) to: {output_csv}")
 
 
 def main():
     ensure_model_exists()
     ft_model = fasttext.load_model(MODEL_FILE)
 
-    rows = []
+    # Aggregate data by model_type and language
+    model_type_data = {}
+
     for entry in sorted(os.scandir(RESPONSES_ROOT), key=lambda e: e.name):
         if not entry.is_dir():
             continue
@@ -163,25 +179,39 @@ def main():
         if not os.path.exists(model_outputs_path):
             continue
 
-        stats, output_total_length, mismatch_detected_counter = analyze_model_outputs_file(
+        stats, output_total_length, mismatch_detected_counter, ground_truth_lang_counter = analyze_model_outputs_file(
             ft_model,
             model_outputs_path,
             meta["lang_prefix"],
         )
-        row = build_row(
-            entry.name,
-            meta,
-            stats,
-            output_total_length,
-            mismatch_detected_counter,
-        )
-        rows.append(row)
+        
+        # Initialize model_type and language entry if not present
+        model_type = meta["model_type"]
+        lang = meta["lang_prefix"]
+        
+        if model_type not in model_type_data:
+            model_type_data[model_type] = {}
+        
+        if lang not in model_type_data[model_type]:
+            model_type_data[model_type][lang] = {
+                "total_correct": 0,
+                "total_incorrect": 0,
+                "total_no_responses": 0,
+                "ground_truth_lang_counter": Counter(),
+            }
+        
+        # Aggregate data for this model_type and language
+        model_type_data[model_type][lang]["total_correct"] += stats["correct"]
+        model_type_data[model_type][lang]["total_incorrect"] += stats["incorrect"]
+        model_type_data[model_type][lang]["total_no_responses"] += stats.get("no_responses", 0)
+        model_type_data[model_type][lang]["ground_truth_lang_counter"].update(ground_truth_lang_counter)
+        
         print(
-            f"Processed {entry.name}: mislang={row['mislang_pct']}%, "
-            f"avg_length={row['avg_length']}"
+            f"Processed {entry.name}: correct={stats['correct']}, incorrect={stats['incorrect']}"
         )
 
-    append_rows(rows)
+    rows = build_aggregated_rows(model_type_data)
+    write_aggregated_rows(rows, OUTPUT_CSV)
 
 
 if __name__ == "__main__":
