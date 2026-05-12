@@ -11,9 +11,10 @@ except ImportError:
 
 
 DEFAULT_INPUTS = [
-    "/home/gangstat/NeMA_result/analysis/cm_icr.csv",
-    "/home/gangstat/NeMA_result/analysis/cm_lacomsa.csv",
-    "/home/gangstat/NeMA_result/analysis/cm_mapo.csv",
+    # "/home/gangstat/NeMA_result/analysis/cm_icr.csv",
+    # "/home/gangstat/NeMA_result/analysis/cm_lacomsa.csv",
+    # "/home/gangstat/NeMA_result/analysis/cm_mapo.csv",
+    "/home/gangstat/NeMA_result/analysis/confusion_train_mapo.csv",
 ]
 DEFAULT_OUTPUT_DIR = "/home/gangstat/NeMA_result/analysis/figures"
 
@@ -144,7 +145,7 @@ def main():
         print("No valid confusion CSV files found.")
         return
 
-    combined_out = os.path.join(args.output_dir, "confusion_heatmaps_combined.png")
+    combined_out = os.path.join(args.output_dir, "confusion_heatmaps_combined_positive_mapo.png")
     plot_combined_heatmap(dfs, names, combined_out)
     print(f"Saved: {combined_out}")
 

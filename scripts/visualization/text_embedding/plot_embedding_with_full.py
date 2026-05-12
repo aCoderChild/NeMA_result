@@ -6,6 +6,7 @@ stored in caches (populate them with embedding_*.py / plot_embedding_same_instru
 """
 
 import argparse
+import hashlib
 import importlib.util
 import json
 import re
@@ -65,7 +66,8 @@ def parse_args():
             "(plot_embedding_same_instruction); optional Gemini (one point per --langs, default es/ru) "
             "from --gemini-cache-path; optional extra training-checkpoint embeddings from "
             "--extra-checkpoint-cache-paths (e.g. ICR+NPO Ultrafeedback per-checkpoint JSON cache); "
-            "optional --additional-chosen-cache-path / --additional-rejected-cache-path (pre-embedded batches). "
+            "optional --additional-chosen-cache-path / --additional-rejected-cache-path (pre-embedded batches); "
+            "optional --policy-rollout-cache-path (embedding_policy_rollout_responses.py output, same markers as add. rejected). "
             "Use --skip-gemini for main + extras only. "
             "No embedding API calls are made — only disk cache reads."
         )
@@ -153,6 +155,14 @@ def parse_args():
         help=(
             "JSON cache with pre-computed embeddings for extra rejected-side points "
             "(e.g. icr_*_neg_rejected_cache.json). Filtered by --langs. Empty to disable."
+        ),
+    )
+    p.add_argument(
+        "--policy-rollout-cache-path",
+        default="",
+        help=(
+            "JSON cache from embedding_policy_rollout_responses.py (policy instruction+response rollouts). "
+            "Plotted like --additional-rejected-cache-path (red X, variant label). Filtered by --langs. Empty to disable."
         ),
     )
     p.add_argument(
@@ -361,6 +371,74 @@ def load_additional_side_cache(
     return out
 
 
+def _policy_rollout_style(model_type: str) -> tuple[str, str]:
+    """(matplotlib marker, face color hex) for policy rollout cache rows."""
+    mt = (model_type or "").strip()
+    known = {
+        "icr_ppo": ("P", "#ff7f0e"),
+        "icr-w-reinforce-0.1-checkpoint10": ("D", "#756bb1"),
+        "icr-w-reinforce-0.1-checkpoint36": ("s", "#31a354"),
+    }
+    if mt in known:
+        return known[mt]
+    i = int(hashlib.sha256(mt.encode("utf-8")).hexdigest()[:8], 16)
+    markers = ("P", "D", "s", "v", "^", "<", ">", "h")
+    return markers[i % len(markers)], _EXTRA_CKPT_COLORS_HEX[i % len(_EXTRA_CKPT_COLORS_HEX)]
+
+
+def load_policy_rollout_cache(
+    cache_path: Path,
+    embedding_model: str,
+    target_langs: set[str],
+) -> list[dict]:
+    """
+    Same JSON shape as embedding_policy_rollout_responses.py output, but plotted with
+    distinct markers/colors per ``model_type`` (not the same red X as human rejected).
+    """
+    raw = cache_path.read_text(encoding="utf-8")
+    data = json.loads(raw)
+    if data.get("embedding_model") and data["embedding_model"] != embedding_model:
+        raise ValueError(
+            f"{cache_path.name}: embedding_model={data['embedding_model']!r} "
+            f"!= CLI {embedding_model!r}"
+        )
+    stem = cache_path.stem
+    out: list[dict] = []
+    for it in data.get("items") or []:
+        lg = it.get("lang")
+        if lg not in target_langs:
+            continue
+        emb = it.get("embedding")
+        if not isinstance(emb, list) or not emb:
+            raise RuntimeError(
+                f"{cache_path}: missing embedding (lang={lg}, jsonl_line={it.get('jsonl_line')})"
+            )
+        mt = it.get("model_type") or ""
+        if not mt and it.get("jsonl_path"):
+            mt = Path(str(it["jsonl_path"])).parent.name
+        marker, plot_color = _policy_rollout_style(mt)
+        out.append(
+            {
+                "side": "rejected",
+                "marker": marker,
+                "plot_color": plot_color,
+                "lang": lg,
+                "source_key": "policy_rollout",
+                "source_path": str(it.get("jsonl_path") or cache_path),
+                "embedding": emb,
+                "embedding_text": it.get("embedding_text") or it.get("text") or "",
+                "series": "policy_rollout",
+                "model_type": mt,
+                "additional_label": it.get("variant") or stem,
+                "pair_id": it.get("pair_id"),
+                "jsonl_line": it.get("jsonl_line"),
+                "instruction": it.get("instruction"),
+            }
+        )
+    out.sort(key=lambda r: (r.get("lang", ""), str(r.get("model_type", "")), int(r.get("jsonl_line") or 0)))
+    return out
+
+
 def _checkpoint_sort_key(dirname: str) -> tuple[int, str]:
     m = re.match(r"^checkpoint-(\d+)$", dirname)
     if m:
@@ -564,7 +642,10 @@ def _draw_positive_hull_region(ax, xy, points, *, alpha: float, pad_frac: float)
 def _scatter_projection(ax, xy, points, title, xlabel, ylabel, show_lang: bool, show_file: bool):
     for i, p in enumerate(points):
         side = p.get("side", "")
-        if side == "rejected":
+        series = p.get("series", "")
+        if series == "policy_rollout":
+            color = p.get("plot_color", "#ff7f0e")
+        elif side == "rejected":
             color = "tab:red"
         elif side in ("chosen", "gemini"):
             color = "tab:green"
@@ -576,6 +657,8 @@ def _scatter_projection(ax, xy, points, title, xlabel, ylabel, show_lang: bool, 
             size = 185
         elif side == "ufb_ckpt":
             size = 132
+        elif series == "policy_rollout":
+            size = 118
         elif p.get("series") == "additional_cache":
             size = 95
         else:
@@ -594,6 +677,12 @@ def _scatter_projection(ax, xy, points, title, xlabel, ylabel, show_lang: bool, 
         parts = []
         if side == "gemini":
             parts.append("gemini")
+        if series == "policy_rollout":
+            mt = str(p.get("model_type") or "").strip()
+            if mt:
+                parts.append(mt if len(mt) <= 40 else mt[:37] + "...")
+            if (show_lang or show_file) and p.get("additional_label"):
+                parts.append(str(p["additional_label"])[:48])
         if p.get("series") == "additional_cache" and (show_lang or show_file):
             jl = p.get("jsonl_line")
             lbl = str(p.get("additional_label") or "")[:42]
@@ -644,6 +733,7 @@ def plot_umap_tsne(
     methods_plotted: list[str],
     plot_has_additional_chosen: bool,
     plot_has_additional_rejected: bool,
+    plot_has_policy_rollout: bool,
 ):
     X = np.array([p["embedding"] for p in points], dtype=np.float64)
     if not np.isfinite(X).all():
@@ -768,6 +858,31 @@ def plot_umap_tsne(
                 label="UFB checkpoints (^ es / v ru; color = ckpt)",
             )
         )
+    if plot_has_policy_rollout:
+        seen = set()
+        for p in points:
+            if p.get("series") != "policy_rollout":
+                continue
+            mt = str(p.get("model_type") or "").strip() or "policy"
+            mk = p.get("marker") or "P"
+            col = p.get("plot_color") or "#ff7f0e"
+            key = (mt, mk, col)
+            if key in seen:
+                continue
+            seen.add(key)
+            lbl = f"rollout {mt}" if len(mt) <= 36 else f"rollout {mt[:33]}..."
+            leg.append(
+                plt.Line2D(
+                    [0],
+                    [0],
+                    marker=mk,
+                    color="w",
+                    markerfacecolor=col,
+                    markersize=10,
+                    linestyle="None",
+                    label=lbl,
+                )
+            )
     method_legend = {
         "lacomsa": plt.Line2D([0], [0], marker="o", color="k", linestyle="None", markersize=10, label="lacomsa"),
         "icr": plt.Line2D([0], [0], marker="s", color="k", linestyle="None", markersize=10, label="icr"),
@@ -861,6 +976,17 @@ def main():
         else []
     )
 
+    policy_rollout_path = optional_cache_path(args.policy_rollout_cache_path)
+    policy_rollout_pts = (
+        load_policy_rollout_cache(
+            policy_rollout_path,
+            args.embedding_model,
+            target_langs,
+        )
+        if policy_rollout_path
+        else []
+    )
+
     extra_paths = parse_extra_checkpoint_cache_paths(args.extra_checkpoint_cache_paths)
     extras = (
         load_extra_checkpoint_model_points(extra_paths, args.embedding_model, target_langs)
@@ -878,7 +1004,7 @@ def main():
             target_langs=target_langs,
         )
 
-    merged = baseline + gemini_pts + extras + add_chosen_pts + add_rejected_pts
+    merged = baseline + gemini_pts + extras + add_chosen_pts + add_rejected_pts + policy_rollout_pts
 
     if args.verbose:
         print("[plot_embedding_with_full] Cached sources (vectors from disk):")
@@ -905,6 +1031,10 @@ def main():
             print(f"  add-rejected cache: {add_rejected_path}  ({len(add_rejected_pts)} pts)")
         else:
             print("  add-rejected cache: (none)")
+        if policy_rollout_path:
+            print(f"  policy-rollout cache: {policy_rollout_path}  ({len(policy_rollout_pts)} pts)")
+        else:
+            print("  policy-rollout cache: (none)")
         print(f"[plot_embedding_with_full] Total plotted vectors: {len(merged)} (still no remote embed calls).")
 
     subt = [
@@ -915,8 +1045,10 @@ def main():
         subt.append("Gemini 1/lang")
     if extras:
         subt.append("UFB ckpts")
-    if add_chosen_pts or add_rejected_pts:
-        subt.append(f"add {len(add_chosen_pts)}+{len(add_rejected_pts)} (ch+rj)")
+    if add_chosen_pts or add_rejected_pts or policy_rollout_pts:
+        subt.append(
+            f"add ch={len(add_chosen_pts)} rj={len(add_rejected_pts)} pol={len(policy_rollout_pts)}"
+        )
     run_summary = " + ".join(subt)
 
     plot_umap_tsne(
@@ -937,11 +1069,13 @@ def main():
         methods_plotted=sk,
         plot_has_additional_chosen=bool(add_chosen_pts),
         plot_has_additional_rejected=bool(add_rejected_pts),
+        plot_has_policy_rollout=bool(policy_rollout_pts),
     )
     print(
         f"[methods={','.join(sk)}] "
         f"Plotted {len(baseline)} main + {len(gemini_pts)} Gemini + {len(extras)} UFB "
         f"+ {len(add_chosen_pts)} add-chosen + {len(add_rejected_pts)} add-rejected "
+        f"+ {len(policy_rollout_pts)} policy-rollout "
         f"= {len(merged)} pts -> {args.plot_path}"
     )
     print(f"[run] {run_summary}")

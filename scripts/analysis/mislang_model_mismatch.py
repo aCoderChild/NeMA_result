@@ -13,9 +13,9 @@ import numpy as np
 MODEL_FILE = "lid.176.ftz"
 MODEL_URL = "https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.ftz"
 RESPONSES_ROOTS = ["responses/icr", "responses/mapo", "responses/lacomsa"]
-OUTPUT_CSV = "analysis/mislang_multilangs_model_lacomsa.csv"
+OUTPUT_CSV = "analysis/mislang_multilangs_model_mapo.csv"
 LANGUAGES = ["de", "fr", "en", "es", "ru"]
-DEFAULT_METHOD = "lacomsa"
+DEFAULT_METHOD = "mapo"
 
 FILE_PATTERN = re.compile(
     r"^(?P<lang_prefix>[a-z]+)-results-(?P<method>[a-z]+)_enesru_llama3_8b_(?P<model_type>.+?)_(?P<version>v\d+)$"
