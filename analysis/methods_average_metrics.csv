@@ -1,0 +1,46 @@
+Training_Method, Optimization_Method, Avg_LC, Avg_WR, Num_Languages, Num_Samples
+ICR            , dpo                ,  18.25,  18.32,             5,           5
+ICR            , npo                ,   0.01,   0.02,             5,           5
+ICR            , npo_checkpoint-1   ,  14.75,  17.18,             5,           5
+ICR            , npo_checkpoint-10  ,  16.9 ,  19.55,             5,           5
+ICR            , npo_checkpoint-2   ,  15.12,  17.14,             5,           5
+ICR            , npo_checkpoint-20  ,   5.54,   9.27,             5,           5
+ICR            , npo_checkpoint-3   ,  15.69,  17.94,             5,           5
+ICR            , npo_checkpoint-30  ,   0.0 ,   0.0 ,             5,           5
+ICR            , npo_checkpoint-4   ,  15.91,  18.17,             5,           5
+ICR            , npo_checkpoint-5   ,  15.45,  17.83,             5,           5
+ICR            , ppo                ,  15.58,  17.13,             5,           5
+ICR            , sft                ,  12.9 ,  14.78,             5,           5
+ICR            , w-reinforce        ,  20.37,  21.94,             5,           5
+ICR            , w-reinforce_0.1    ,  22.01,  28.19,             5,           5
+ICR            , w-reinforce_10     ,  15.31,  16.66,             5,           5
+LaCoMSA        , dpo                ,  16.31,  18.63,             5,           5
+LaCoMSA        , npo                ,   0.18,   0.34,             5,           5
+LaCoMSA        , npo_checkpoint-1   ,  15.65,  18.04,             5,           5
+LaCoMSA        , npo_checkpoint-10  ,  16.1 ,  18.15,             5,           5
+LaCoMSA        , npo_checkpoint-2   ,  14.86,  17.4 ,             5,           5
+LaCoMSA        , npo_checkpoint-20  ,  15.91,  18.11,             5,           5
+LaCoMSA        , npo_checkpoint-3   ,  14.82,  17.27,             5,           5
+LaCoMSA        , npo_checkpoint-30  ,   0.67,   1.07,             5,           5
+LaCoMSA        , npo_checkpoint-4   ,  15.46,  17.59,             5,           5
+LaCoMSA        , npo_checkpoint-5   ,  15.38,  17.7 ,             5,           5
+LaCoMSA        , ppo                ,  15.23,  17.7 ,             5,           5
+LaCoMSA        , sft                ,  16.39,  18.4 ,             5,           5
+LaCoMSA        , w-reinforce        ,  15.9 ,  18.65,             5,           5
+LaCoMSA        , w-reinforce_0.1    ,  17.93,  18.53,             5,           5
+LaCoMSA        , w-reinforce_10     ,  14.87,  18.07,             5,           5
+MAPO           , dpo                ,  16.68,  18.42,             5,           5
+MAPO           , npo                ,   1.54,   4.05,             5,           5
+MAPO           , npo_checkpoint-1   ,  15.65,  18.04,             5,           5
+MAPO           , npo_checkpoint-10  ,  15.52,  18.36,             5,           5
+MAPO           , npo_checkpoint-2   ,  15.48,  17.61,             5,           5
+MAPO           , npo_checkpoint-20  ,   4.2 ,   8.37,             5,           5
+MAPO           , npo_checkpoint-3   ,  15.35,  17.74,             5,           5
+MAPO           , npo_checkpoint-30  ,   2.56,   5.66,             5,           5
+MAPO           , npo_checkpoint-4   ,  15.38,  17.44,             5,           5
+MAPO           , npo_checkpoint-5   ,  15.79,  18.01,             5,           5
+MAPO           , ppo                ,  13.74,  10.75,             5,           5
+MAPO           , sft                ,  11.57,   7.98,             5,           5
+MAPO           , w-reinforce        ,  16.49,  18.2 ,             5,           5
+MAPO           , w-reinforce_0.1    ,  12.88,  17.11,             5,           5
+MAPO           , w-reinforce_10     ,  16.51,  17.49,             5,           5

@@ -2,9 +2,9 @@ import os
 import csv
 
 # Path to the {method} folder and output CSV
-dir = "responses/lacomsa"
-method_name = "lacomsa"
-output_csv = "results/full_npo/RAIL CrossLingual Transfer - LACOMSA_Results_Run_01.csv"
+dir = "responses/mapo"
+method_name = "mapo"
+output_csv = "results/full_npo/RAIL CrossLingual Transfer - MAPO_Results_Run_01.csv"
 
 # The columns to match runs
 columns = [

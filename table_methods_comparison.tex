@@ -1,0 +1,34 @@
+\begin{table*}[t]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{ll|cc|cc|cc|cc|cc|cc}
+\toprule
+\multirow{2}{*}{\textbf{Method}} & \multirow{2}{*}{\textbf{Approach}} & \multicolumn{4}{c|}{\textbf{In-Distribution (ID)}} & \multicolumn{6}{c|}{\textbf{Out-of-Distribution (OOD)}} & \multicolumn{2}{c}{\textbf{Avg}} \\
+ &  & \multicolumn{2}{c}{\textbf{es}} & \multicolumn{2}{c|}{\textbf{ru}} & \multicolumn{2}{c}{\textbf{en}} & \multicolumn{2}{c}{\textbf{de}} & \multicolumn{2}{c|}{\textbf{fr}} & LC & WR \\
+ &  & LC & WR & LC & WR & LC & WR & LC & WR & LC & WR &  &  \\
+\midrule
+\multirow{5}{*}{\textbf{ICR}} & SFT & 11.46 & 13.35 & 12.31 & 15.4 & 17.1 & 16.96 & 11.66 & 13.91 & 11.97 & 14.29 & 12.9 & 14.78 \\
+  & PPO & 14.48 & 15.09 & 13.99 & 18.26 & 20.15 & 19.88 & 14.32 & 15.96 & 14.93 & 16.46 & 15.57 & 17.13 \\
+  & NPO (Ckpt-5) & 13.91 & 15.09 & 12.74 & 18.51 & 20.21 & 19.75 & 15.26 & 18.39 & 15.14 & 17.39 & 15.45 & 17.83 \\
+  & DPO & 19.2 & 18.07 & 18.07 & 20.99 & 18.87 & 17.27 & 17.57 & 17.64 & 17.57 & 17.64 & 18.26 & 18.32 \\
+  & W-Reinforce & 20.53 & 20.99 & 22.32 & 25.28 & 21.96 & 21.74 & 17.43 & 20.12 & 19.6 & 21.55 & 20.37 & 21.94 \\
+\midrule
+\multirow{5}{*}{\textbf{LaCoMSA}} & SFT & 16.76 & 18.26 & 16.1 & 20.25 & 18.06 & 18.2 & 15.55 & 17.95 & 15.48 & 17.33 & 16.39 & 18.4 \\
+  & PPO & 13.81 & 16.09 & 13.78 & 18.2 & 19.37 & 20.0 & 13.57 & 15.78 & 15.59 & 18.45 & 15.22 & 17.7 \\
+  & NPO (Ckpt-5) & 14.54 & 16.27 & 12.98 & 17.7 & 19.95 & 19.94 & 12.09 & 15.16 & 17.36 & 19.44 & 15.38 & 17.7 \\
+  & DPO & 16.58 & 18.2 & 15.01 & 20.43 & 21.28 & 21.18 & 14.17 & 16.34 & 14.52 & 17.02 & 16.31 & 18.63 \\
+  & W-Reinforce & 14.57 & 16.65 & 13.29 & 18.7 & 20.11 & 20.37 & 15.04 & 17.27 & 16.48 & 20.25 & 15.9 & 18.65 \\
+\midrule
+\multirow{5}{*}{\textbf{MAPO}} & SFT & 13.43 & 8.94 & 9.05 & 7.52 & 12.24 & 7.08 & 10.62 & 7.33 & 12.51 & 9.01 & 11.57 & 7.98 \\
+  & PPO & 14.62 & 10.43 & 10.48 & 9.75 & 14.17 & 10.5 & 14.67 & 11.61 & 14.75 & 11.43 & 13.74 & 10.74 \\
+  & NPO (Ckpt-5) & 14.3 & 15.59 & 13.1 & 18.76 & 21.7 & 21.37 & 13.17 & 14.91 & 16.69 & 19.44 & 15.79 & 18.01 \\
+  & DPO & 14.78 & 15.84 & 15.15 & 19.69 & 21.81 & 20.81 & 15.46 & 17.45 & 16.19 & 18.32 & 16.68 & 18.42 \\
+  & W-Reinforce & 16.75 & 17.08 & 13.72 & 18.76 & 20.66 & 20.0 & 16.91 & 17.83 & 14.39 & 17.33 & 16.49 & 18.2 \\
+\midrule
+\bottomrule
+\end{tabular}
+\caption{Length-controlled win rate (LC) and win rate (WR) across different training approaches (SFT, PPO, NPO, DPO, W-Reinforce), organized by language distribution.}
+\label{tab:methods_comparison}
+\end{table*}
