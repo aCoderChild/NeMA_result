@@ -1,0 +1,7 @@
+model          , language, mean_id           , n_layers
+base-sft-dpo   , ru      , 17.93713640806182 ,       32
+icr_dpo_ckpt36 , ru      , 17.922495892810538,       32
+icr_npo_ckpt10 , ru      , 16.92729659149657 ,       32
+icr_npo_ckpt36 , ru      , 18.00116106159632 ,       32
+icr_ppo_ckpt36 , ru      , 16.101601279213487,       32
+icr_w_reinforce, ru      , 18.274821386363964,       32

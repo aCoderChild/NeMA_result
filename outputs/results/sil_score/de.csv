@@ -1,0 +1,6 @@
+model          , language, mean_silhouette_score, n_layers
+base-sft-dpo   , de      ,   0.1834064823673401 ,       32
+icr_dpo_ckpt36 , de      ,   0.23680537547317174,       32
+icr_npo_ckpt10 , de      ,   0.162168641146087  ,       32
+icr_ppo_ckpt36 , de      ,   0.14314895796493163,       32
+icr_w_reinforce, de      ,   0.20731865658705892,       32

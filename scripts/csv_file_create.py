@@ -1,162 +1,207 @@
-import os
+import argparse
 import csv
+import os
+import re
+from pathlib import Path
 
-# Path to the {method} folder and output CSV
-dir = "responses/mapo"
-method_name = "mapo"
-output_csv = "results/full_npo/RAIL CrossLingual Transfer - MAPO_Results_Run_01.csv"
 
-# The columns to match runs
-columns = [
-    "source", "model", "win_rate", "standard_error", "mode", "avg_length",
-    "n_wins", "n_wins_base", "n_draws", "n_total", "discrete_win_rate",
-    "length_controlled_winrate", "lc_standard_error"
+RESULTS_DIR = Path("results/full_npo")
+LANG_ORDER = ["de", "en", "es", "fr", "ru"]
+COLUMNS = [
+    "source",
+    "model",
+    "win_rate",
+    "standard_error",
+    "mode",
+    "avg_length",
+    "n_wins",
+    "n_wins_base",
+    "n_draws",
+    "n_total",
+    "discrete_win_rate",
+    "length_controlled_winrate",
+    "lc_standard_error",
 ]
 
-# Helper function to extract stats from a result folder
-def extract_stats_from_folder(folder_path, expected_model=None):
-    leaderboard_path = os.path.join(folder_path, "leaderboard.csv")
-    if not os.path.exists(leaderboard_path):
+METHODS = {
+    "icr": {
+        "input_dirs": [Path("responses/icr"), Path("responses/random/icr")],
+        "output_csv": RESULTS_DIR / "RAIL CrossLingual Transfer - ICR_Results_Run_01.csv",
+    },
+    "lacomsa": {
+        "input_dirs": [Path("responses/lacomsa"), Path("responses/random/lacomsa")],
+        "output_csv": RESULTS_DIR / "RAIL CrossLingual Transfer - LACOMSA_Results_Run_01.csv",
+    },
+    "mapo": {
+        "input_dirs": [Path("responses/mapo"), Path("responses/random/mapo")],
+        "output_csv": RESULTS_DIR / "RAIL CrossLingual Transfer - MAPO_Results_Run_01.csv",
+    },
+}
+
+MODEL_ORDER = [
+    "w-reinforce",
+    "w-reinforce_random",
+    "w-reinforce_negative",
+    "dpo_250426",
+    "dpo",
+    "ppo_150426",
+    "ppo",
+    "sft_150426",
+    "sft",
+    "npo_checkpoint-1",
+    "npo_checkpoint-2",
+    "npo_checkpoint-3",
+    "npo_checkpoint-4",
+    "npo_checkpoint-5",
+    "npo_checkpoint-10",
+    "npo_checkpoint-20",
+    "npo_checkpoint-30",
+    "npo_150426",
+    "npo",
+]
+
+
+def stats_from_row(row):
+    return {column: row.get(column, "") for column in COLUMNS if column not in {"source", "model"}}
+
+
+def normalized_row(row):
+    return {str(k).strip(): str(v).strip() for k, v in row.items()}
+
+
+def extract_stats_from_folder(folder_path, model_candidates):
+    leaderboard_path = folder_path / "leaderboard.csv"
+    if not leaderboard_path.exists():
         return None
 
-    with open(leaderboard_path, newline='') as csvfile:
+    with leaderboard_path.open(newline="") as csvfile:
         reader = csv.DictReader(csvfile, skipinitialspace=True)
         if reader.fieldnames:
             reader.fieldnames = [name.strip() for name in reader.fieldnames]
-        for row in reader:
-            # Strip whitespace from keys and values
-            row = {k.strip(): v.strip() for k, v in row.items()}
-            # If there's a model column, match it
-            if expected_model:
-                model_in_row = row.get("model", "") or row.get("", "")  # Sometimes the first column is unnamed
-                # IMPORTANT: Require the method-specific prefix to avoid matching other methods.
-                required_prefix = f"{method_name}_enesru_llama3_8b_"
-                if model_in_row.startswith(required_prefix) and expected_model in model_in_row:
-                    return {
-                        "win_rate": row.get("win_rate", ""),
-                        "standard_error": row.get("standard_error", ""),
-                        "mode": row.get("mode", ""),
-                        "avg_length": row.get("avg_length", ""),
-                        "n_wins": row.get("n_wins", ""),
-                        "n_wins_base": row.get("n_wins_base", ""),
-                        "n_draws": row.get("n_draws", ""),
-                        "n_total": row.get("n_total", ""),
-                        "discrete_win_rate": row.get("discrete_win_rate", ""),
-                        "length_controlled_winrate": row.get("length_controlled_winrate", ""),
-                        "lc_standard_error": row.get("lc_standard_error", "")
-                    }
-    # If we didn't find an exact match but an expected_model was provided,
-    # try a looser match based on the method suffix (e.g. 'npo_checkpoint-1' -> 'npo_checkpoint-1'
-    # or 'npo') to handle leaderboards that store shorter model names.
-    # IMPORTANT: require the model row to start with "lacomsa_enesru_llama3_8b_" to avoid
-    # picking up rows from other methods (e.g., mapo_enesru_llama3_8b_npo when looking for lacomsa npo).
-    if expected_model:
-        method_suffix = expected_model.split(f"{method_name}_enesru_llama3_8b_")[-1]
-        required_prefix = f"{method_name}_enesru_llama3_8b_"
-        with open(leaderboard_path, newline='') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                row = {k.strip(): v.strip() for k, v in row.items()}
-                model_in_row = row.get("model", "") or row.get("", "")
-                # Match only if it starts with the correct prefix AND ends with the suffix
-                if model_in_row.startswith(required_prefix) and (method_suffix in model_in_row or model_in_row in method_suffix):
-                    return {
-                        "win_rate": row.get("win_rate", ""),
-                        "standard_error": row.get("standard_error", ""),
-                        "mode": row.get("mode", ""),
-                        "avg_length": row.get("avg_length", ""),
-                        "n_wins": row.get("n_wins", ""),
-                        "n_wins_base": row.get("n_wins_base", ""),
-                        "n_draws": row.get("n_draws", ""),
-                        "n_total": row.get("n_total", ""),
-                        "discrete_win_rate": row.get("discrete_win_rate", ""),
-                        "length_controlled_winrate": row.get("length_controlled_winrate", ""),
-                        "lc_standard_error": row.get("lc_standard_error", "")
-                    }
+        rows = [normalized_row(row) for row in reader]
+
+    candidates = set(model_candidates)
+    for row in rows:
+        model_in_row = row.get("model", "") or row.get("", "")
+        if model_in_row in candidates:
+            return stats_from_row(row)
+
+    for row in rows:
+        model_in_row = row.get("model", "") or row.get("", "")
+        if any(model_in_row.endswith(candidate) for candidate in candidates):
+            return stats_from_row(row)
+
     return None
 
-import re
 
-# Previous simpler regex caused two issues:
-# 1) It didn't include underscores in the model part (so "npo_checkpoint-1" matched only "npo").
-# 2) The commented triple-quoted snippet contained an invalid escape sequence and produced
-#    a SyntaxWarning. The function below matches the full model token and strips any
-#    trailing "_v<digits>" version suffix.
-def extract_model_from_folder(folder_name):
-    # Capture e.g. '{method}_enesru_llama3_8b_npo_checkpoint-1' (optionally followed by '_v0')
-    match = re.search(rf"({method_name}_enesru_llama3_8b_[A-Za-z0-9_-]+)(?:_v\d+)?", folder_name)
-    if match:
-        model = match.group(1)
-        # Ensure we remove any trailing _vN that may have been captured
-        model = re.sub(r"_v\d+$", "", model)
-        return model
-    return folder_name
+def strip_version(model_name):
+    return re.sub(r"_v\d+$", "", model_name)
 
-rows = []
 
-for entry in os.listdir(dir):
-    # Only process folders that match {method}_enesru_llama3 pattern
-    if entry.startswith(f"de-results-{method_name}_enesru_llama3_") or \
-       entry.startswith(f"en-results-{method_name}_enesru_llama3_") or \
-       entry.startswith(f"es-results-{method_name}_enesru_llama3_") or \
-       entry.startswith(f"fr-results-{method_name}_enesru_llama3_") or \
-       entry.startswith(f"ru-results-{method_name}_enesru_llama3_"):
-        # Extract language and method
-        parts = entry.split("_")
-        lang = entry[:2]
-        # Some method names contain multiple parts (e.g. "npo_checkpoint-1").
-        # Join all parts between the model prefix and the trailing version tag.
-        method = "_".join(parts[4:-1]) if len(parts) > 5 else parts[4]
-        model = extract_model_from_folder(entry)
+def parse_result_folder(entry, method_name):
+    pattern = rf"^({'|'.join(LANG_ORDER)})-results-({re.escape(method_name)}(?:_enesru_llama3_8b)?_.+)$"
+    match = re.match(pattern, entry)
+    if not match:
+        return None
 
-        # Use the shorter `method` token when looking up leaderboard rows
-        # because leaderboard 'model' values may omit the full prefix.
-        stats = extract_stats_from_folder(os.path.join(dir, entry), method)
-        if stats is None:
-            print(f"Skipping {entry}: no leaderboard/stats found or no matching model row")
+    lang, raw_model = match.groups()
+    raw_model = strip_version(raw_model)
+
+    if raw_model.startswith(f"{method_name}_enesru_llama3_8b_"):
+        model = raw_model
+        suffix = raw_model.removeprefix(f"{method_name}_enesru_llama3_8b_")
+        candidates = [
+            raw_model,
+            f"{method_name}_{suffix}",
+            suffix,
+        ]
+    else:
+        suffix = raw_model.removeprefix(f"{method_name}_")
+        model = f"{method_name}_enesru_llama3_8b_{suffix}"
+        candidates = [
+            raw_model,
+            model,
+            suffix,
+        ]
+
+    return lang, model, candidates
+
+
+def collect_rows(method_name, input_dirs):
+    rows = []
+    seen = set()
+
+    for input_dir in input_dirs:
+        if not input_dir.exists():
             continue
 
-        row = {
-            "source": lang,
-            "model": model,
-            "win_rate": stats["win_rate"],
-            "standard_error": stats["standard_error"],
-            "mode": stats["mode"],
-            "avg_length": stats["avg_length"],
-            "n_wins": stats["n_wins"],
-            "n_wins_base": stats["n_wins_base"],
-            "n_draws": stats["n_draws"],
-            "n_total": stats["n_total"],
-            "discrete_win_rate": stats["discrete_win_rate"],
-            "length_controlled_winrate": stats["length_controlled_winrate"],
-            "lc_standard_error": stats["lc_standard_error"]
-        }
-        rows.append(row)
+        for entry in sorted(os.listdir(input_dir)):
+            parsed = parse_result_folder(entry, method_name)
+            if parsed is None:
+                continue
 
-lang_order = ['de', 'en', 'es', 'fr', 'ru']
-model_order = ['w-reinforce', 'dpo_250426', 'ppo', 'sft', 'npo_checkpoint-1', 'npo_checkpoint-2', 'npo_checkpoint-3', 'npo_checkpoint-4', 'npo_checkpoint-5', 'npo_checkpoint-10', 'npo_checkpoint-20', 'npo_checkpoint-30', 'npo']
-# model_order = ['w-reinforce_150426', 'dpo_150426', 'ppo_150426', 'sft_150426', 'npo_150426']
+            lang, model, candidates = parsed
+            key = (lang, model)
+            if key in seen:
+                continue
 
-def model_sort_key(model_name):
-    for method in model_order:
-        if f"_{method}" in model_name:
-            return model_order.index(method)
-    return len(model_order)
+            stats = extract_stats_from_folder(input_dir / entry, candidates)
+            if stats is None:
+                print(f"Skipping {input_dir / entry}: no matching leaderboard row")
+                continue
+
+            rows.append({"source": lang, "model": model, **stats})
+            seen.add(key)
+
+    return rows
+
+
+def model_suffix(model_name):
+    return model_name.split("_8b_", 1)[-1]
+
 
 def model_sort_key(model_name):
-    # Extract the method part from the model name
-    for method in model_order:
-        if model_name.endswith(method):
-            return model_order.index(method)
-    return len(model_order)  # If not found, put at the end
+    suffix = model_suffix(model_name)
+    for index, expected_suffix in enumerate(MODEL_ORDER):
+        if suffix == expected_suffix:
+            return index
+    return len(MODEL_ORDER)
 
-rows.sort(key=lambda x: (lang_order.index(x["source"]), model_sort_key(x["model"])))
 
-# Write to CSV
-with open(output_csv, "w", newline="") as f:
-    writer = csv.DictWriter(f, fieldnames=columns)
-    writer.writeheader()
-    for row in rows:
-        writer.writerow(row)
+def write_method_csv(method_name):
+    config = METHODS[method_name]
+    rows = collect_rows(method_name, config["input_dirs"])
+    rows.sort(key=lambda row: (LANG_ORDER.index(row["source"]), model_sort_key(row["model"]), row["model"]))
 
-print(f"Results written to {output_csv}")
+    output_csv = config["output_csv"]
+    output_csv.parent.mkdir(parents=True, exist_ok=True)
+    with output_csv.open("w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=COLUMNS)
+        writer.writeheader()
+        writer.writerows(rows)
+
+    print(f"Results written to {output_csv} ({len(rows)} rows)")
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Create cross-lingual result CSVs from response leaderboard folders."
+    )
+    parser.add_argument(
+        "--methods",
+        nargs="+",
+        choices=sorted(METHODS),
+        default=["icr", "lacomsa"],
+        help="Methods to generate. Defaults to icr and lacomsa.",
+    )
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
+    for method_name in args.methods:
+        write_method_csv(method_name)
+
+
+if __name__ == "__main__":
+    main()

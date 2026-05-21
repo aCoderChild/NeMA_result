@@ -1,0 +1,16 @@
+source, model               , win_rate          , length_controlled_winrate, avg_length
+de    , w-reinforce_random  , 16.65             ,        11.21             ,       2155
+de    , w-reinforce_negative, 17.39             ,        16.90             ,       1634
+de    , w-reinforce_0.1_1.0 , 28.19875776397516 ,        21.649208381439163,       2091
+en    , w-reinforce_random  , 28.76             ,        28.09             ,       2408
+en    , w-reinforce_negative, 16.71             ,        17.26             ,       1861
+en    , w-reinforce_0.1_1.0 , 26.521739130434785,        22.774265147521806,       1912
+es    , w-reinforce_random  , 16.83             ,        11.98             ,       2102
+es    , w-reinforce_negative, 17.33             ,        18.10             ,       1571
+es    , w-reinforce_0.1_1.0 , 26.335403726708073,        21.0901785657023  ,       1950
+fr    , w-reinforce_random  , 22.48             ,        16.02             ,       2202
+fr    , w-reinforce_negative, 18.88             ,        18.56             ,       1647
+fr    , w-reinforce_0.1_1.0 , 29.627329192546586,        22.389569211542522,       2063
+ru    , w-reinforce_random  , 20.12             ,        12.92             ,       2042
+ru    , w-reinforce_negative, 17.83             ,        15.10             ,       1475
+ru    , w-reinforce_0.1_1.0 , 30.248447204968944,        22.165304091703355,       1971
