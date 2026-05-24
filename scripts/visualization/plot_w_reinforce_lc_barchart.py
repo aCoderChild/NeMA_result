@@ -32,6 +32,7 @@ MODEL_ORDER = [
     "w-reinforce_10.0_1.0",
     "dpo",
     "w-reinforce_random",
+    "w-reinforce_positive",
     "w-reinforce_negative",
 ]
 
