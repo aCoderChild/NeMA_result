@@ -1,26 +1,56 @@
-source, model              , win_rate, length_controlled_winrate, avg_length
-de    , w-reinforce_0.1_1.0,    17.08,                     12.67,       2785
-de    , dpo                ,    16.02,                     11.69,       3567
-de    , ppo                ,    15.96,                     13.28,       1933
-de    , sft                ,     0.99,                      0.29,      10481
-de    , npo                ,     0.00,                      0.00,      12043
-en    , w-reinforce_0.1_1.0,    19.13,                     14.38,       2056
-en    , dpo                ,    16.40,                     12.55,       2535
-en    , ppo                ,    18.88,                     19.70,       1657
-en    , sft                ,     0.87,                      0.33,       9238
-en    , npo                ,     0.25,                      0.08,      12231
-es    , w-reinforce_0.1_1.0,    18.07,                     12.97,       2459
-es    , dpo                ,    19.13,                     14.36,       3298
-es    , ppo                ,    17.64,                     15.52,       1780
-es    , sft                ,     1.37,                      0.50,       8880
-es    , npo                ,     0.00,                      0.00,      12446
-fr    , w-reinforce_0.1_1.0,    17.95,                     14.48,       2820
-fr    , dpo                ,    18.26,                     15.61,       4161
-fr    , ppo                ,    18.14,                     14.86,       1895
-fr    , sft                ,     0.50,                      0.15,       9971
-fr    , npo                ,     0.00,                      0.00,      12153
-ru    , w-reinforce_0.1_1.0,    17.39,                     13.10,       2694
-ru    , dpo                ,    12.17,                      9.58,       4293
-ru    , ppo                ,    17.39,                     12.98,       1789
-ru    , sft                ,     0.75,                      0.19,       9798
-ru    , npo                ,     0.00,                      0.00,      10726
+source, model                         , win_rate, length_controlled_winrate, avg_length
+de    , w-reinforce_0.1_1.0           ,    17.08,                     12.67,       2785
+de    , w-reinforce                   ,    19.13,                     13.52,       2764
+de    , w-reinforce_10.0_1.0          ,    16.34,                     12.58,       2184
+de    , w-reinforce_random            ,    10.87,                      9.81,       1692
+de    , w-reinforce_positive          ,    15.47,                     13.91,       1763
+de    , w-reinforce_negative          ,    17.20,                     16.07,       1661
+de    , dpo                           ,    16.02,                     11.69,       3567
+de    , ppo                           ,    15.96,                     13.28,       1933
+de    , sft                           ,     0.99,                      0.29,      10481
+de    , npo_checkpoint-10             ,    16.21,                     14.74,       1812
+de    , npo                           ,     0.00,                      0.00,      12043
+en    , w-reinforce_0.1_1.0           ,    19.13,                     14.38,       2056
+en    , w-reinforce                   ,    22.11,                     16.48,       2143
+en    , w-reinforce_10.0_1.0          ,    19.13,                     17.70,       1823
+en    , w-reinforce_random            ,    15.59,                     16.01,       1648
+en    , w-reinforce_positive          ,    16.02,                     16.71,       1625
+en    , w-reinforce_negative          ,    15.78,                     16.89,       1611
+en    , dpo                           ,    16.40,                     12.55,       2535
+en    , ppo                           ,    18.88,                     19.70,       1657
+en    , sft                           ,     0.87,                      0.33,       9238
+en    , npo_checkpoint-10             ,    20.50,                     20.56,       1655
+en    , npo                           ,     0.25,                      0.08,      12231
+es    , w-reinforce_0.1_1.0           ,    18.07,                     12.97,       2459
+es    , w-reinforce                   ,    21.99,                     14.37,       2580
+es    , w-reinforce_10.0_1.0          ,    18.51,                     13.88,       2054
+es    , w-reinforce_random            ,    10.93,                     10.90,       1634
+es    , w-reinforce_positive          ,    15.34,                     16.05,       1571
+es    , w-reinforce_negative          ,    14.97,                     15.25,       1599
+es    , dpo                           ,    19.13,                     14.36,       3298
+es    , ppo                           ,    17.64,                     15.52,       1780
+es    , sft                           ,     1.37,                      0.50,       8880
+es    , npo_checkpoint-10             ,    15.47,                     13.55,       1684
+es    , npo                           ,     0.00,                      0.00,      12446
+fr    , w-reinforce_0.1_1.0           ,    17.95,                     14.48,       2820
+fr    , w-reinforce                   ,    19.63,                     14.58,       2904
+fr    , w-reinforce_10.0_1.0          ,    17.76,                     13.57,       2283
+fr    , w-reinforce_random            ,    12.11,                     11.50,       1694
+fr    , w-reinforce_positive          ,    15.47,                     14.75,       1716
+fr    , w-reinforce_negative          ,    16.27,                     15.39,       1618
+fr    , dpo                           ,    18.26,                     15.61,       4161
+fr    , ppo                           ,    18.14,                     14.86,       1895
+fr    , sft                           ,     0.50,                      0.15,       9971
+fr    , npo_checkpoint-10             ,    17.52,                     15.05,       1732
+fr    , npo                           ,     0.00,                      0.00,      12153
+ru    , w-reinforce_0.1_1.0           ,    17.39,                     13.10,       2694
+ru    , w-reinforce                   ,    18.39,                     12.16,       2696
+ru    , w-reinforce_10.0_1.0          ,    16.52,                     11.67,       2048
+ru    , w-reinforce_random            ,    12.11,                      9.38,       1552
+ru    , w-reinforce_positive          ,    17.70,                     15.10,       1530
+ru    , w-reinforce_negative          ,    20.81,                     20.12,       1981
+ru    , dpo                           ,    12.17,                      9.58,       4293
+ru    , ppo                           ,    17.39,                     12.98,       1789
+ru    , sft                           ,     0.75,                      0.19,       9798
+ru    , npo_checkpoint-10             ,    17.95,                     13.35,       1650
+ru    , npo                           ,     0.00,                      0.00,      10726

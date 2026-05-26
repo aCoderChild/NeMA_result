@@ -8,12 +8,25 @@ LANG_ORDER = ["de", "en", "es", "fr", "ru"]
 MODEL_PREFIX = "lidr_enesru_llama3_8b_"
 MODEL_ORDER = [
     "w-reinforce_0.1_1.0",
+    "w-reinforce",
+    "w-reinforce_10.0_1.0",
+    "w-reinforce_random",
+    "w-reinforce_positive",
+    "w-reinforce_negative",
     "dpo",
     "ppo",
     "sft",
+    "npo_checkpoint-10",
     "npo",
 ]
-MODEL_SET = set(MODEL_ORDER)
+SOURCE_MODEL_ALIASES = {
+    "w-reinforce_1.0_1.0": "w-reinforce",
+    "w-reinforce_positive_heuristic": "w-reinforce_positive",
+    "w-reinforce_negative_heuristic": "w-reinforce_negative",
+}
+MODEL_SET = (set(MODEL_ORDER) - set(SOURCE_MODEL_ALIASES.values())) | set(
+    SOURCE_MODEL_ALIASES
+)
 OUTPUT_COLUMNS = [
     "source",
     "model",
@@ -63,6 +76,7 @@ def load_lidr_rows(input_dir: Path) -> list[dict[str, str]]:
                 model = compact_model_name(full_model_name)
                 if model is None or model not in MODEL_SET:
                     continue
+                model = SOURCE_MODEL_ALIASES.get(model, model)
 
                 output_row = {
                     "source": source,

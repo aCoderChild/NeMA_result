@@ -24,6 +24,11 @@ LANGUAGE_COLORS = {
     "de": "#DC2626",
     "ru": "#059669",
 }
+BASE_FONT_SIZE = 27
+TITLE_FONT_SIZE = 32
+ANNOTATION_FONT_SIZE = 23
+AXIS_LABEL_FONT_SIZE = 27
+FIGURE_SIZE = (17.5, 10.5)
 
 
 def checkpoint_from_model(model_name: str) -> int | None:
@@ -72,19 +77,20 @@ def plot_npo_winrates(
     values: dict[str, dict[int, float]],
     output_path: Path,
     method_name: str,
+    axis_label_font_size: int,
 ) -> None:
     plt.rcParams.update(
         {
             "axes.edgecolor": "#CBD5E1",
             "axes.labelcolor": "#334155",
             "axes.titlecolor": "#0F172A",
-            "font.size": 11,
+            "font.size": BASE_FONT_SIZE,
             "xtick.color": "#475569",
             "ytick.color": "#475569",
         }
     )
 
-    fig, ax = plt.subplots(figsize=(10.5, 6.2), dpi=220)
+    fig, ax = plt.subplots(figsize=FIGURE_SIZE, dpi=220)
     fig.patch.set_facecolor("white")
     ax.set_facecolor("#F8FAFC")
 
@@ -94,10 +100,10 @@ def plot_npo_winrates(
             CHECKPOINTS,
             y_values,
             marker="o",
-            linewidth=2.8,
-            markersize=6.2,
+            linewidth=4.2,
+            markersize=9.5,
             markeredgecolor="white",
-            markeredgewidth=1.4,
+            markeredgewidth=2.0,
             color=LANGUAGE_COLORS.get(language),
             label=LANGUAGE_LABELS.get(language, language.upper()),
         )
@@ -106,7 +112,7 @@ def plot_npo_winrates(
         CHECKPOINTS[-1],
         color="#94A3B8",
         linestyle=(0, (4, 4)),
-        linewidth=1.2,
+        linewidth=2.0,
         alpha=0.8,
     )
     ax.text(
@@ -114,7 +120,7 @@ def plot_npo_winrates(
         ax.get_ylim()[1] * 0.96,
         "NPO",
         color="#64748B",
-        fontsize=9,
+        fontsize=ANNOTATION_FONT_SIZE,
         fontweight="bold",
         ha="center",
         va="top",
@@ -123,14 +129,18 @@ def plot_npo_winrates(
 
     ax.set_title(
         f"{method_name.upper()} NPO Win Rate Across Checkpoints",
-        fontsize=17,
-        fontweight="bold",
-        pad=16,
+        fontsize=TITLE_FONT_SIZE,
+        fontweight="normal",
+        pad=20,
     )
-    ax.set_xlabel("Checkpoint")
-    ax.set_ylabel("Win Rate")
+    ax.set_xlabel("Checkpoint", fontsize=axis_label_font_size)
+    ax.set_ylabel("Win Rate", fontsize=axis_label_font_size)
     ax.set_xticks(CHECKPOINTS)
-    ax.set_xticklabels([str(x) if x != 36 else "36\nNPO" for x in CHECKPOINTS])
+    ax.set_xticklabels(
+        [str(x) if x != 36 else "36\nNPO" for x in CHECKPOINTS],
+        rotation=35,
+        ha="right",
+    )
     ax.set_xlim(min(CHECKPOINTS) - 0.7, max(CHECKPOINTS) + 2.3)
     ax.set_ylim(bottom=0)
     ax.spines["top"].set_visible(False)
@@ -140,13 +150,13 @@ def plot_npo_winrates(
     ax.legend(
         ncols=5,
         loc="upper center",
-        bbox_to_anchor=(0.5, -0.15),
+        bbox_to_anchor=(0.5, -0.25),
         frameon=False,
     )
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.tight_layout(rect=[0, 0.06, 1, 1])
-    fig.savefig(output_path, bbox_inches="tight")
+    fig.subplots_adjust(left=0.10, right=0.98, top=0.86, bottom=0.30)
+    fig.savefig(output_path, bbox_inches="tight", pad_inches=0.12)
     plt.close(fig)
 
 
@@ -171,13 +181,19 @@ def parse_args() -> argparse.Namespace:
         default="ICR",
         help="Method name to show in the chart title.",
     )
+    parser.add_argument(
+        "--axis-label-font-size",
+        type=int,
+        default=AXIS_LABEL_FONT_SIZE,
+        help="Font size for the x-axis and y-axis labels.",
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
     values = load_npo_winrates(args.input)
-    plot_npo_winrates(values, args.output, args.method)
+    plot_npo_winrates(values, args.output, args.method, args.axis_label_font_size)
     print(f"Saved chart to: {args.output}")
 
 

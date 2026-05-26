@@ -1,0 +1,23 @@
+\begin{table*}[t]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{ll|ccc}
+\toprule
+\textbf{Distribution} & \textbf{Language} & \multicolumn{3}{c}{\textbf{$\lambda$}} \\
+ &  & \textbf{0.1} & \textbf{1} & \textbf{10} \\
+\midrule
+\multirow{2}{*}{\textbf{ID}} & \textbf{es} & 20.95 & 19.88 & 16.63 \\
+ & \textbf{ru} & 21.90 & 20.79 & 18.03 \\
+\midrule
+\multirow{3}{*}{\textbf{OOD}} & \textbf{en} & 21.86 & 21.41 & 19.61 \\
+ & \textbf{de} & 20.83 & 18.84 & 16.05 \\
+ & \textbf{fr} & 22.19 & 20.48 & 17.00 \\
+\midrule
+\multicolumn{2}{l|}{\textbf{Avg}} & 21.55 & 20.28 & 17.46 \\
+\bottomrule
+\end{tabular}
+\caption{Average Win Rate (WR) of LIDR, ICR, and LaCoMSA across different $\lambda$ values, organized by language distribution.}
+\label{tab:lambda_reorganized_wr}
+\end{table*}

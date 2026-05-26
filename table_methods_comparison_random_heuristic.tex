@@ -1,0 +1,27 @@
+\begin{table*}[t]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{ll|cc|cc|cc|cc|cc|cc}
+\toprule
+\multirow{3}{*}{\textbf{Sampling Method}} & \multirow{3}{*}{\textbf{Preference Setting}} & \multicolumn{4}{c|}{\textbf{In-Distribution (ID)}} & \multicolumn{6}{c|}{\textbf{Out-of-Distribution (OOD)}} & \multicolumn{2}{c}{\textbf{Avg}} \\
+ & & \multicolumn{2}{c}{\textbf{es}} & \multicolumn{2}{c|}{\textbf{ru}} & \multicolumn{2}{c}{\textbf{en}} & \multicolumn{2}{c}{\textbf{de}} & \multicolumn{2}{c|}{\textbf{fr}} & & \\
+ & & LC & WR & LC & WR & LC & WR & LC & WR & LC & WR & LC & WR \\
+\midrule
+\multirow{3}{*}{\textbf{LIDR}} & DPO & 14.36 & \textbf{19.13} & 9.58 & 12.17 & 12.55 & \textbf{16.40} & 11.69 & \textbf{16.02} & \textbf{15.61} & \textbf{18.26} & 12.76 & \textbf{16.40} \\
+ & Random & 10.90 & 10.93 & 9.38 & 12.11 & 16.01 & 15.59 & 9.81 & 10.87 & 11.50 & 12.11 & 11.52 & 12.32 \\
+ & Heuristic & \textbf{16.05} & 15.34 & \textbf{15.10} & \textbf{17.70} & \textbf{16.71} & 16.02 & \textbf{13.91} & 15.47 & 14.75 & 15.47 & \textbf{15.30} & 16.00 \\
+\midrule
+\multirow{3}{*}{\textbf{ICR}} & DPO & \textbf{19.20} & 18.07 & \textbf{18.07} & 20.99 & 18.87 & 17.27 & 17.57 & 17.64 & 17.57 & 17.64 & 18.25 & 18.32 \\
+ & Random & 11.98 & 16.83 & 12.92 & 20.12 & \textbf{28.09} & \textbf{28.76} & 11.21 & 16.65 & 16.02 & 22.48 & 16.04 & 20.97 \\
+ & Heuristic & 19.15 & \textbf{26.52} & 17.15 & \textbf{27.45} & 23.62 & 27.64 & \textbf{18.08} & \textbf{26.77} & \textbf{20.64} & \textbf{29.69} & \textbf{19.73} & \textbf{27.61} \\
+\midrule
+\multirow{3}{*}{\textbf{LaCoMSA}} & DPO & 16.58 & 18.20 & 15.01 & \textbf{20.43} & 21.28 & \textbf{21.18} & 14.17 & 16.34 & 14.52 & 17.02 & 16.31 & 18.63 \\
+ & Random & 15.76 & 17.02 & \textbf{15.26} & 20.31 & \textbf{21.79} & 21.06 & \textbf{14.79} & \textbf{17.58} & \textbf{17.68} & \textbf{19.81} & \textbf{17.06} & \textbf{19.16} \\
+ & Heuristic & \textbf{18.55} & \textbf{19.88} & 14.27 & 19.19 & 19.12 & 18.82 & 14.21 & 16.65 & 17.24 & 19.69 & 16.68 & 18.85 \\
+\bottomrule
+\end{tabular}
+\caption{Length-Controlled Win Rate (LC) and Win Rate (WR) for DPO, Random, and Heuristic variants.}
+\label{tab:methods_comparison_random_heuristic}
+\end{table*}
